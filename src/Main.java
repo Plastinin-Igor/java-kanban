@@ -28,7 +28,7 @@ public class Main {
         task2 = taskManager.addNewTask(taskObj2);
 
         //Эпик 1
-        Epic epicObj1 = new Epic("Эпик-задача № 1", "Описание эпик-задачи №1", Status.NEW);
+        Epic epicObj1 = new Epic("Эпик-задача № 1", "Описание эпик-задачи №1");
         epic1 = taskManager.addNewEpic(epicObj1);
 
         //Подзадача 1.1
@@ -42,7 +42,7 @@ public class Main {
         subtask2 = taskManager.addNewSubtask(subtaskObj2);
 
         //Эпик 2
-        Epic epicObj2 = new Epic("Эпик-задача № 1", "Описание эпик-задачи №1", Status.NEW);
+        Epic epicObj2 = new Epic("Эпик-задача № 1", "Описание эпик-задачи №1");
         epic2 = taskManager.addNewEpic(epicObj2);
 
         //Подзадача 2.1
@@ -89,8 +89,15 @@ public class Main {
         System.out.println();
 
         //УДАЛИТЬ ОДНУ ИЗ ЗАДАЧ И ОДИН ИЗ ЭПИКОВ
-        taskManager.deleteTaskById(taskObj2.getTaskId());
-        taskManager.deleteEpicById(epicObj2.getTaskId());
+        //taskManager.deleteTaskById(taskObj2.getTaskId());
+        //taskManager.deleteEpicById(epicObj2.getTaskId());
+
+        System.out.println();
+        System.out.println(taskManager.getListTask());
+
+
+
+
 
     }
 }

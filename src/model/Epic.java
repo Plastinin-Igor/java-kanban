@@ -1,32 +1,43 @@
 package model;
+
 import java.util.ArrayList;
 
-public class Epic extends TaskItem{
-    ArrayList<Integer> subtaskId = new ArrayList<>();
+public class Epic extends TaskItem {
+    private ArrayList<Integer> subtaskId = new ArrayList<>();
 
-    public Epic(int taskId, String taskName, String taskDescription, Status taskStatus) {
-        super(taskId, taskName, taskDescription, taskStatus);
+    public Epic(int taskId, String taskName, String taskDescription) {
+        super(taskId, taskName, taskDescription);
     }
 
-    public Epic(String taskName, String taskDescription, Status taskStatus) {
-        super(taskName, taskDescription, taskStatus);
-    }
-
-    public Epic(ArrayList<Integer> subtaskId,int taskId, String taskName, String taskDescription, Status taskStatus) {
-        super(taskId, taskName, taskDescription, taskStatus);
-        this.subtaskId = subtaskId;
+    public Epic(String taskName, String taskDescription) {
+        super(taskName, taskDescription);
     }
 
     public ArrayList<Integer> getSubtaskId() {
         return subtaskId;
     }
 
-    public void setSubtaskId(ArrayList<Integer> subtaskId) {
-        this.subtaskId = subtaskId;
+    /**
+     *  Удаление единичной подзадачи из хранилища subtaskId
+     * @param id
+     */
+    public void deleteSubtaskIdById(int id) {
+        subtaskId.remove(id);
     }
 
-    public int IndexOf(int id) {
-        return subtaskId.indexOf(id);
+    /**
+     * Удаление всех данные из хранилища subtaskId
+     */
+    public void deleteAllSubtaskId() {
+        subtaskId.clear();
+    }
+
+    /**
+     * Добавление задачи в хранилище subtaskId
+     * @param id
+     */
+    public void addNewSubtaskId(int id) {
+        subtaskId.add(id);
     }
 
     @Override

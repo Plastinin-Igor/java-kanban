@@ -15,10 +15,26 @@ public abstract class TaskItem {
         this.taskStatus = taskStatus;
     }
 
+    public TaskItem(int taskId, String taskName, String taskDescription) {
+        this.taskId = taskId;
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.taskStatus = Status.NEW;
+    }
+
+
     public TaskItem(String taskName, String taskDescription, Status taskStatus) {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskStatus = taskStatus;
+    }
+
+
+
+    public TaskItem(String taskName, String taskDescription) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.taskStatus = Status.NEW;
     }
 
     public int getTaskId() {
