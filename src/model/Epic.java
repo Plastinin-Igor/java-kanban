@@ -19,7 +19,7 @@ public class Epic extends TaskItem {
 
     /**
      *  Удаление единичной подзадачи из хранилища subtaskId
-     * @param id
+     * @param id идентификатор подзадачи
      */
     public void deleteSubtaskIdById(int id) {
         subtaskId.remove(id);
@@ -34,7 +34,7 @@ public class Epic extends TaskItem {
 
     /**
      * Добавление задачи в хранилище subtaskId
-     * @param id
+     * @param id идентификатор подзадачи
      */
     public void addNewSubtaskId(int id) {
         subtaskId.add(id);

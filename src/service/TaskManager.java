@@ -58,23 +58,28 @@ public class TaskManager {
      * Удаление всех эпик-задач
      */
     public void deleteEpic() {
-        subtaskMap.clear(); //Удаление подзадач из эпика
-        epicMap.clear(); //Удаление самого эпика
+        subtaskMap.clear(); //Удаление подзадач
+        epicMap.clear(); //Удаление эпиков
     }
 
     /**
      * Удаление всех подзадач
      */
     public void deleteSubtask() {
-
+        //Удаление подзадач
         subtaskMap.clear();
+        //Удаление подзадач из всех эпиков обновление статуса в эпиках
+        for (Integer epicLocal : epicMap.keySet()) {
+            epicMap.get(epicLocal).deleteAllSubtaskId();
+            updateEpicStatus(epicMap.get(epicLocal));
+        }
     }
 
     /**
      * Получение по идентификатору задачи
      *
-     * @param taskId int
-     * @return Task
+     * @param taskId идентификатор задачи
+     * @return Task объект
      */
     public Task getTaskById(int taskId) {
         return taskMap.get(taskId);
@@ -83,8 +88,8 @@ public class TaskManager {
     /**
      * Получение по идентификатору эпик-задачи
      *
-     * @param taskId int
-     * @return Epic
+     * @param taskId идентификатор эпика
+     * @return Epic объект
      */
     public Epic getEpicById(int taskId) {
         return epicMap.get(taskId);
@@ -93,8 +98,8 @@ public class TaskManager {
     /**
      * Получение по идентификатору подзадачи
      *
-     * @param taskId int
-     * @return Subtask
+     * @param taskId идентификатор подзадачи
+     * @return Subtask объект
      */
     public Subtask getSubtaskById(int taskId) {
         return subtaskMap.get(taskId);
@@ -102,6 +107,10 @@ public class TaskManager {
 
     /**
      * Обновление статуса в эпик-задаче
+     * Если у эпика нет подзадач то его статус NEW;
+     * Или все подзадачи имеют статус NEW, тогда эпик тоже NEW,
+     * если все подзадачи имеют статус DONE, то и у эпика статус тоже DONE
+     * во всех остальных случаях статус - IN_PROGRESS
      *
      * @param epic Epic
      */
@@ -170,8 +179,7 @@ public class TaskManager {
         if (epicMap.containsKey(subtask.getEpicId())) {
             generateIdentifier();
             subtask.setTaskId(id);
-            ArrayList<Integer> subtaskId = epicMap.get(subtask.getEpicId()).getSubtaskId();
-            subtaskId.add(id);
+            epicMap.get(subtask.getEpicId()).addNewSubtaskId(id); // добавление id подзадачи в эпик
             subtaskMap.put(id, subtask);
             updateEpicStatus(epicMap.get(subtask.getEpicId())); // обновление статуса в эпик-задаче
             return subtask;
@@ -182,14 +190,19 @@ public class TaskManager {
     }
 
     /**
-     * Обновление обычной задачи
+     * Обновление обычной задачи.
+     * Обновляются только те задачи, которые уже есть в хранилище taskMap
      *
      * @param task Task
      * @return Task
      */
     public Task updateTask(Task task) {
-        taskMap.put(task.getTaskId(), task);
-        return task;
+        if (taskMap.containsKey(task.getTaskId())) {
+            taskMap.put(task.getTaskId(), task);
+            return task;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -217,9 +230,20 @@ public class TaskManager {
      * @return Subtask
      */
     public Subtask updateSubtask(Subtask subtask) {
-        subtaskMap.put(subtask.getTaskId(), subtask);
-        updateEpicStatus(epicMap.get(subtask.getEpicId())); // обновление статуса в эпик-задаче
-        return subtask;
+        // проверяем, есть ли такая подзадача
+        if (subtaskMap.containsKey(subtask.getTaskId())) {
+            //проверяем равен ли epicId в новой подзадаче со значением epicId подзадачи
+            if (subtask.getEpicId() == subtaskMap.get(subtask.getTaskId()).getEpicId()) {
+                subtaskMap.put(subtask.getTaskId(), subtask);
+                updateEpicStatus(epicMap.get(subtask.getEpicId())); // обновление статуса в эпик-задаче
+                return subtask;
+            } else {
+                System.out.println("Подзадачи не переходят между Эпиками");
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -237,12 +261,10 @@ public class TaskManager {
      * @param taskId int
      */
     public void deleteEpicById(int taskId) {
-        //Удаляем подзадачи (если есть) из эпика
-        if (!epicMap.get(taskId).getSubtaskId().isEmpty()) {
-            epicMap.get(taskId).getSubtaskId().clear();
+        if (epicMap.containsKey(taskId)) {
+            epicMap.get(taskId).getSubtaskId().clear(); // Удаление, связанных с эпиком подзадач
+            epicMap.remove(taskId); //Удаляем эпик
         }
-        //Удаляем эпик
-        epicMap.remove(taskId);
     }
 
     /**
@@ -251,16 +273,12 @@ public class TaskManager {
      * @param taskId int
      */
     public void deleteSubtaskById(int taskId) {
-        //Удалим информацию о подзадаче из эпик-задачи
-        Subtask subtask;
-        subtask = subtaskMap.get(taskId);
-        if (epicMap.containsKey(subtask.getEpicId())) {
-            ArrayList<Integer> subtaskId = epicMap.get(subtask.getEpicId()).getSubtaskId();
-            int indexOf = subtaskId.indexOf(taskId);
-            subtaskId.remove(indexOf);
+        Subtask subtask = subtaskMap.get(taskId);
+        if (subtask != null) {
+            epicMap.get(subtask.getEpicId()).deleteSubtaskIdById(taskId); // удаляем подзадачу из эпика
+            subtaskMap.remove(taskId); // удаляем подзадачу
+            updateEpicStatus(epicMap.get(subtask.getEpicId())); // обновление статуса в эпик-задаче
         }
-        subtaskMap.remove(taskId); // удаляем подзадачу
-        updateEpicStatus(epicMap.get(subtask.getEpicId())); // обновление статуса в эпик-задаче
     }
 
     /**
