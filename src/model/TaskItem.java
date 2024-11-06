@@ -22,14 +22,11 @@ public abstract class TaskItem {
         this.taskStatus = Status.NEW;
     }
 
-
     public TaskItem(String taskName, String taskDescription, Status taskStatus) {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskStatus = taskStatus;
     }
-
-
 
     public TaskItem(String taskName, String taskDescription) {
         this.taskName = taskName;

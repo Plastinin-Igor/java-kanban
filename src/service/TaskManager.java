@@ -116,7 +116,7 @@ public class TaskManager {
      */
     private void updateEpicStatus(Epic epic) {
         //Если у эпика нет подзадач - статус NEW
-        if (epic.getSubtaskId().isEmpty()) {
+        if (epic.getSubtaskListId().isEmpty()) {
             epic.setTaskStatus(Status.NEW);
             return;
         }
@@ -124,7 +124,7 @@ public class TaskManager {
         boolean isNew = true;
         boolean isDone = true;
         Status status;
-        for (Integer epicsSub : epic.getSubtaskId()) {
+        for (Integer epicsSub : epic.getSubtaskListId()) {
             status = subtaskMap.get(epicsSub).getTaskStatus();
 
             if (status != Status.NEW) {
@@ -262,7 +262,7 @@ public class TaskManager {
      */
     public void deleteEpicById(int taskId) {
         if (epicMap.containsKey(taskId)) {
-            epicMap.get(taskId).getSubtaskId().clear(); // Удаление, связанных с эпиком подзадач
+            epicMap.get(taskId).getSubtaskListId().clear(); // Удаление, связанных с эпиком подзадач
             epicMap.remove(taskId); //Удаляем эпик
         }
     }
@@ -290,8 +290,8 @@ public class TaskManager {
     public ArrayList<Subtask> getSubtaskByEpicId(int epicId) {
         Epic epic = epicMap.get(epicId);
         ArrayList<Subtask> subtasks = new ArrayList<>();
-        for (int i = 0; i < epic.getSubtaskId().size(); i++) {
-            subtasks.add(subtaskMap.get(epic.getSubtaskId().get(i)));
+        for (int i = 0; i < epic.getSubtaskListId().size(); i++) {
+            subtasks.add(subtaskMap.get(epic.getSubtaskListId().get(i)));
         }
         return subtasks;
     }

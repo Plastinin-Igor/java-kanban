@@ -88,16 +88,5 @@ public class Main {
         System.out.println("    " + subtask3);
         System.out.println();
 
-        //УДАЛИТЬ ОДНУ ИЗ ЗАДАЧ И ОДИН ИЗ ЭПИКОВ
-        //taskManager.deleteTaskById(taskObj2.getTaskId());
-        //taskManager.deleteEpicById(epicObj2.getTaskId());
-
-        System.out.println();
-        System.out.println(taskManager.getListTask());
-
-
-
-
-
     }
 }

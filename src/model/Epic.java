@@ -3,7 +3,7 @@ package model;
 import java.util.ArrayList;
 
 public class Epic extends TaskItem {
-    private ArrayList<Integer> subtaskId = new ArrayList<>();
+    private ArrayList<Integer> subtaskListId = new ArrayList<>();
 
     public Epic(int taskId, String taskName, String taskDescription) {
         super(taskId, taskName, taskDescription);
@@ -13,31 +13,33 @@ public class Epic extends TaskItem {
         super(taskName, taskDescription);
     }
 
-    public ArrayList<Integer> getSubtaskId() {
-        return subtaskId;
+    public ArrayList<Integer> getSubtaskListId() {
+        return subtaskListId;
     }
 
     /**
-     *  Удаление единичной подзадачи из хранилища subtaskId
+     * Удаление единичной подзадачи из хранилища subtaskListId
+     *
      * @param id идентификатор подзадачи
      */
     public void deleteSubtaskIdById(int id) {
-        subtaskId.remove(id);
+        subtaskListId.remove(subtaskListId.indexOf(id));
     }
 
     /**
-     * Удаление всех данные из хранилища subtaskId
+     * Удаление всех данные из хранилища subtaskListId
      */
     public void deleteAllSubtaskId() {
-        subtaskId.clear();
+        subtaskListId.clear();
     }
 
     /**
-     * Добавление задачи в хранилище subtaskId
+     * Добавление задачи в хранилище subtaskListId
+     *
      * @param id идентификатор подзадачи
      */
     public void addNewSubtaskId(int id) {
-        subtaskId.add(id);
+        subtaskListId.add(id);
     }
 
     @Override
@@ -47,7 +49,7 @@ public class Epic extends TaskItem {
                 ", Наименование='" + super.getTaskName() + '\'' +
                 ", Описание='" + super.getTaskDescription() + '\'' +
                 ", Статус='" + super.getTaskStatus() + '\'' +
-                ", Подзадача='" + subtaskId + '\'' +
+                ", Подзадача='" + subtaskListId + '\'' +
                 '}';
     }
 }
