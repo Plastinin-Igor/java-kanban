@@ -213,10 +213,9 @@ public class TaskManager {
      */
     public Epic updateEpic(Epic epic) {
         if (epicMap.containsKey(epic.getTaskId())) {
-            Epic epicLocal = getEpicById(epic.getTaskId());
+            Epic epicLocal = epicMap.get(epic.getTaskId());
             epicLocal.setTaskName(epic.getTaskName());
             epicLocal.setTaskDescription(epic.getTaskDescription());
-            epicMap.put(epic.getTaskId(), epicLocal);
             return epic;
         } else {
             return null;
@@ -262,8 +261,12 @@ public class TaskManager {
      */
     public void deleteEpicById(int taskId) {
         if (epicMap.containsKey(taskId)) {
-            epicMap.get(taskId).getSubtaskListId().clear(); // Удаление, связанных с эпиком подзадач
-            epicMap.remove(taskId); //Удаляем эпик
+            // Удаление, связанных с эпиком подзадач
+            for (int i = 0; i < epicMap.get(taskId).getSubtaskListId().size(); i++) {
+                epicMap.get(taskId).getSubtaskListId().remove(i);
+            }
+            //Удаляем эпик
+            epicMap.remove(taskId);
         }
     }
 
@@ -290,8 +293,10 @@ public class TaskManager {
     public ArrayList<Subtask> getSubtaskByEpicId(int epicId) {
         Epic epic = epicMap.get(epicId);
         ArrayList<Subtask> subtasks = new ArrayList<>();
-        for (int i = 0; i < epic.getSubtaskListId().size(); i++) {
-            subtasks.add(subtaskMap.get(epic.getSubtaskListId().get(i)));
+        if (epic != null) {
+            for (int i = 0; i < epic.getSubtaskListId().size(); i++) {
+                subtasks.add(subtaskMap.get(epic.getSubtaskListId().get(i)));
+            }
         }
         return subtasks;
     }
