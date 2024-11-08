@@ -262,8 +262,8 @@ public class TaskManager {
     public void deleteEpicById(int taskId) {
         if (epicMap.containsKey(taskId)) {
             // Удаление, связанных с эпиком подзадач
-            for (int i = 0; i < epicMap.get(taskId).getSubtaskListId().size(); i++) {
-                epicMap.get(taskId).getSubtaskListId().remove(i);
+            for (Integer subtask : epicMap.get(taskId).getSubtaskListId()) {
+                subtaskMap.remove(subtask);
             }
             //Удаляем эпик
             epicMap.remove(taskId);
