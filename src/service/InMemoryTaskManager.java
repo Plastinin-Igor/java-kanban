@@ -326,10 +326,4 @@ public class InMemoryTaskManager implements TaskManager {
         }
         return subtasks;
     }
-
-
-    public Collection<TaskItem> getHistory() {
-        return historyManager.getHistory();
-    }
-
 }

@@ -18,6 +18,9 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private ArrayList<TaskItem> historyList = new ArrayList<>();
 
+    public InMemoryHistoryManager() {
+        this.historyList = new ArrayList<>();
+    }
     /**
      * Добавление просмотренной задачи в историю
      * Список для хранения просмотров не превышает 10 элементов
@@ -25,7 +28,7 @@ public class InMemoryHistoryManager implements HistoryManager {
      */
     @Override
     public void add(TaskItem task) {
-        if (historyList.size() == 10) {
+        if (historyList.size() > 10) {
             historyList.remove(0);
         }
         historyList.add(task);
