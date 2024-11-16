@@ -2,8 +2,11 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
+/**
+ * Методы, которые должны быть у любого объекта-менеджера
+ */
 public interface TaskManager {
+
     Collection<Task> getListTask();
 
     Collection<Epic> getListEpic();

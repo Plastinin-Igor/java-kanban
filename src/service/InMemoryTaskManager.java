@@ -2,6 +2,7 @@ package service;
 
 import model.*;
 import util.InMemoryHistoryManager;
+import util.Managers;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,7 +15,7 @@ public class InMemoryTaskManager implements TaskManager {
     private HashMap<Integer, Epic> epicMap = new HashMap<>();
     private HashMap<Integer, Subtask> subtaskMap = new HashMap<>();
 
-    InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+    HistoryManager historyManager = Managers.getDefaultHistory();
 
     /**
      * Генерация уникального идентификатора задачи/эпика/подзадачи
@@ -324,6 +325,11 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
         return subtasks;
+    }
+
+
+    public Collection<TaskItem> getHistory() {
+        return historyManager.getHistory();
     }
 
 }

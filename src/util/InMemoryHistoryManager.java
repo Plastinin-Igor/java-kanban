@@ -16,7 +16,7 @@ import java.util.Collection;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    ArrayList<TaskItem> historyList = new ArrayList<>();
+    private ArrayList<TaskItem> historyList = new ArrayList<>();
 
     /**
      * Добавление просмотренной задачи в историю
