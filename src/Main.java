@@ -5,7 +5,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        TaskManager taskManager = new TaskManager();
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
 
         TaskItem task1;
         TaskItem task2;
@@ -88,5 +88,6 @@ public class Main {
         System.out.println("    " + subtask3);
         System.out.println();
 
+        System.out.println();
     }
 }

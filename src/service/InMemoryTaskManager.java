@@ -1,17 +1,20 @@
 package service;
 
 import model.*;
+import util.InMemoryHistoryManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class TaskManager {
+public class InMemoryTaskManager implements TaskManager {
     private int id = 0;
 
     private HashMap<Integer, Task> taskMap = new HashMap<>();
     private HashMap<Integer, Epic> epicMap = new HashMap<>();
     private HashMap<Integer, Subtask> subtaskMap = new HashMap<>();
+
+    InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
 
     /**
      * Генерация уникального идентификатора задачи/эпика/подзадачи
@@ -25,6 +28,7 @@ public class TaskManager {
      *
      * @return List Task
      */
+    @Override
     public Collection<Task> getListTask() {
         return taskMap.values();
     }
@@ -34,6 +38,7 @@ public class TaskManager {
      *
      * @return List Epic
      */
+    @Override
     public Collection<Epic> getListEpic() {
         return epicMap.values();
     }
@@ -43,6 +48,7 @@ public class TaskManager {
      *
      * @return List Subtask
      */
+    @Override
     public Collection<Subtask> getListSubtask() {
         return subtaskMap.values();
     }
@@ -50,6 +56,7 @@ public class TaskManager {
     /**
      * Удаление всех задач
      */
+    @Override
     public void deleteTask() {
         taskMap.clear();
     }
@@ -57,6 +64,7 @@ public class TaskManager {
     /**
      * Удаление всех эпик-задач
      */
+    @Override
     public void deleteEpic() {
         subtaskMap.clear(); //Удаление подзадач
         epicMap.clear(); //Удаление эпиков
@@ -65,6 +73,7 @@ public class TaskManager {
     /**
      * Удаление всех подзадач
      */
+    @Override
     public void deleteSubtask() {
         //Удаление подзадач
         subtaskMap.clear();
@@ -81,7 +90,9 @@ public class TaskManager {
      * @param taskId идентификатор задачи
      * @return Task объект
      */
+    @Override
     public Task getTaskById(int taskId) {
+        historyManager.add(taskMap.get(taskId));
         return taskMap.get(taskId);
     }
 
@@ -91,7 +102,9 @@ public class TaskManager {
      * @param taskId идентификатор эпика
      * @return Epic объект
      */
+    @Override
     public Epic getEpicById(int taskId) {
+        historyManager.add(epicMap.get(taskId));
         return epicMap.get(taskId);
     }
 
@@ -101,7 +114,9 @@ public class TaskManager {
      * @param taskId идентификатор подзадачи
      * @return Subtask объект
      */
+    @Override
     public Subtask getSubtaskById(int taskId) {
+        historyManager.add(subtaskMap.get(taskId));
         return subtaskMap.get(taskId);
     }
 
@@ -149,6 +164,7 @@ public class TaskManager {
      * @param task Task
      * @return Task
      */
+    @Override
     public Task addNewTask(Task task) {
         generateIdentifier();
         task.setTaskId(id);
@@ -162,6 +178,7 @@ public class TaskManager {
      * @param epic Epic
      * @return Epic
      */
+    @Override
     public Epic addNewEpic(Epic epic) {
         generateIdentifier();
         epic.setTaskId(id);
@@ -175,6 +192,7 @@ public class TaskManager {
      * @param subtask Subtask
      * @return Subtask
      */
+    @Override
     public Subtask addNewSubtask(Subtask subtask) {
         if (epicMap.containsKey(subtask.getEpicId())) {
             generateIdentifier();
@@ -196,6 +214,7 @@ public class TaskManager {
      * @param task Task
      * @return Task
      */
+    @Override
     public Task updateTask(Task task) {
         if (taskMap.containsKey(task.getTaskId())) {
             taskMap.put(task.getTaskId(), task);
@@ -211,6 +230,7 @@ public class TaskManager {
      * @param epic Epic
      * @return Epic
      */
+    @Override
     public Epic updateEpic(Epic epic) {
         if (epicMap.containsKey(epic.getTaskId())) {
             Epic epicLocal = epicMap.get(epic.getTaskId());
@@ -228,6 +248,7 @@ public class TaskManager {
      * @param subtask Subtask
      * @return Subtask
      */
+    @Override
     public Subtask updateSubtask(Subtask subtask) {
         // проверяем, есть ли такая подзадача
         if (subtaskMap.containsKey(subtask.getTaskId())) {
@@ -250,6 +271,7 @@ public class TaskManager {
      *
      * @param taskId int
      */
+    @Override
     public void deleteTaskById(int taskId) {
         taskMap.remove(taskId);
     }
@@ -259,6 +281,7 @@ public class TaskManager {
      *
      * @param taskId int
      */
+    @Override
     public void deleteEpicById(int taskId) {
         if (epicMap.containsKey(taskId)) {
             // Удаление, связанных с эпиком подзадач
@@ -275,6 +298,7 @@ public class TaskManager {
      *
      * @param taskId int
      */
+    @Override
     public void deleteSubtaskById(int taskId) {
         Subtask subtask = subtaskMap.get(taskId);
         if (subtask != null) {
@@ -290,6 +314,7 @@ public class TaskManager {
      * @param epicId int
      * @return ArrayList Subtask
      */
+    @Override
     public ArrayList<Subtask> getSubtaskByEpicId(int epicId) {
         Epic epic = epicMap.get(epicId);
         ArrayList<Subtask> subtasks = new ArrayList<>();
