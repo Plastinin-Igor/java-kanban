@@ -1,8 +1,7 @@
 package util;
 
-import model.HistoryManager;
-import model.TaskManager;
-import service.InMemoryTaskManager;
+import model.*;
+import service.*;
 
 /**
  * Утилитарный класс для подбора нужной реализации TaskManager и HistoryManager

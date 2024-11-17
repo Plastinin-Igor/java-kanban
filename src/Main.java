@@ -1,21 +1,12 @@
 import model.*;
-import service.*;
-import util.InMemoryHistoryManager;
-import util.Managers;
+import util.*;
 
 public class Main {
 
     public static void main(String[] args) {
 
         TaskManager taskManager = Managers.getDefault();
-
-        TaskItem task1;
-        TaskItem task2;
-        TaskItem epic1;
-        TaskItem epic2;
-        TaskItem subtask1;
-        TaskItem subtask2;
-        TaskItem subtask3;
+        TaskItem task1, task2, epic1, epic2, subtask1, subtask2, subtask3;
 
         //Задача 1
         Task taskObj1 = new Task("Задача № 1", "Описание задачи №1", Status.NEW);
@@ -52,9 +43,9 @@ public class Main {
         taskManager.getSubtaskById(subtask3.getTaskId());
         taskManager.getSubtaskById(subtask3.getTaskId());
 
-
         //НАПЕЧАТАТЬ ВСЕ ЗАДАЧИ И ИСТОРИЮ ПРОСМОТРОВ
         printAllTasks(taskManager);
+
     }
 
     private static void printAllTasks(TaskManager manager) {
@@ -65,12 +56,12 @@ public class Main {
         System.out.println("\nЭпики: ");
         for (TaskItem epic : manager.getListEpic()) {
             System.out.println(epic);
-            for(TaskItem subtask : manager.getSubtaskByEpicId(epic.getTaskId())) {
+            for (TaskItem subtask : manager.getSubtaskByEpicId(epic.getTaskId())) {
                 System.out.println("   --> " + subtask);
             }
         }
         System.out.println("\nИстория:");
-        for (TaskItem task : Managers.getDefaultHistory().getHistory()) {
+        for (TaskItem task : manager.getHistory()) {
             System.out.println(task);
         }
 
