@@ -144,7 +144,7 @@ public interface TaskManager {
      * @param epicId int
      * @return ArrayList Subtask
      */
-    ArrayList<Subtask> getSubtaskByEpicId(int epicId);
+    Collection<Subtask> getSubtaskByEpicId(int epicId);
 
     /**
      * Список просмотренных задач

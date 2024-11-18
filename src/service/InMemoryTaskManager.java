@@ -7,13 +7,14 @@ import util.Managers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
     private int id = 0;
 
-    private HashMap<Integer, Task> taskMap = new HashMap<>();
-    private HashMap<Integer, Epic> epicMap = new HashMap<>();
-    private HashMap<Integer, Subtask> subtaskMap = new HashMap<>();
+    private Map<Integer, Task> taskMap = new HashMap<>();
+    private Map<Integer, Epic> epicMap = new HashMap<>();
+    private Map<Integer, Subtask> subtaskMap = new HashMap<>();
 
     HistoryManager historyManager = Managers.getDefaultHistory();
 
