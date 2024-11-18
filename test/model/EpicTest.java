@@ -12,7 +12,7 @@ class EpicTest {
     Epic epicObject = new Epic("Test addNewEpic name", "Test addNewEpic description");
 
     @Test
-    // Экземпляры класса Epic равны друг другу, если равен их id;
+        // Экземпляры класса Epic равны друг другу, если равен их id;
     void shouldBeEqualInstancesOfTheEpicClassById() {
         TaskItem epic;
         TaskItem savedEpic;
@@ -38,13 +38,4 @@ class EpicTest {
         TaskItem epic = manager.addNewEpic(epicObject);
         Assertions.assertEquals(epic.getTaskStatus(), Status.NEW, "Статус у нового эпика должен быть NEW");
     }
-
-    @Test
-        //Epic нельзя добавить самого себя в виде подзадачи
-    void shouldBeNotEpicAddItselfAsAsSubtask() {
-        TaskItem epic = manager.addNewEpic(epicObject);
-
-    }
-
-
 }
