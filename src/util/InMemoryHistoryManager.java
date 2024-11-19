@@ -42,6 +42,6 @@ public class InMemoryHistoryManager implements HistoryManager {
      */
     @Override
     public Collection<TaskItem> getHistory() {
-        return historyList = new ArrayList<>();
+        return new ArrayList<>(historyList);
     }
 }
