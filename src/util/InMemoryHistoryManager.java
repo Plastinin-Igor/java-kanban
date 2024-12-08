@@ -4,10 +4,7 @@ import model.HistoryManager;
 import model.Node;
 import model.TaskItem;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Управление историей просмотров
@@ -23,8 +20,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     //Указатели на первый и последний элемент списка
     private Node<TaskItem> head;
     private Node<TaskItem> tail;
-
-
+    private int size = 0;
 
 
     public InMemoryHistoryManager() {
@@ -52,7 +48,8 @@ public class InMemoryHistoryManager implements HistoryManager {
      */
     @Override
     public void remove(int id) {
-
+        historyMap.remove(id);
+        removeNode(historyMap.get(id));
     }
 
     /**
@@ -66,34 +63,40 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
 
-
     /**
      * Добавление задачи в конец списка
-     *
      */
-    public void linkLast(TaskItem task){
+    public void linkLast(TaskItem task) {
         final Node<TaskItem> oldTail = tail;
         final Node<TaskItem> newNode = new Node<>(task, tail, null);
         tail = newNode;
         historyMap.put(task.getTaskId(), newNode);
 
         if (oldTail == null) {
-            tail = newNode;
+            head = newNode;
         } else {
             oldTail.prev = newNode;
         }
+        size++;
+    }
+
+    /**
+     * Размер связанного списка
+     *
+     * @return int
+     */
+    public int sizeHistory() {
+        return size;
     }
 
     /**
      * Удаление узла связанного списка
-     *
      */
-    public void removeNode(Node node){
+    public void removeNode(Node node) {
 
     }
 
     /**
-     *
      *
      */
     public List<TaskItem> getTasks() {
