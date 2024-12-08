@@ -15,6 +15,13 @@ public interface HistoryManager {
     void add(TaskItem task);
 
     /**
+     * Удаление задачи из просмотра
+     *
+     * @param id int
+     */
+    void remove(int id);
+
+    /**
      * Получение списка просмотренных пользователем задач
      *
      * @return Collection TaskItem
