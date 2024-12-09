@@ -14,8 +14,7 @@ import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private ArrayList<TaskItem> historyList;
-    private HashMap<Integer, Node<TaskItem>> historyMap;
+    private final HashMap<Integer, Node<TaskItem>> historyMap;
 
     //Указатели на первый и последний элемент списка
     private Node<TaskItem> head;
@@ -24,7 +23,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
 
     public InMemoryHistoryManager() {
-        this.historyList = new ArrayList<>();
         this.historyMap = new HashMap<>();
     }
 
@@ -48,8 +46,8 @@ public class InMemoryHistoryManager implements HistoryManager {
      */
     @Override
     public void remove(int id) {
-        historyMap.remove(id);
         removeNode(historyMap.get(id));
+        historyMap.remove(id);
     }
 
     /**
@@ -59,7 +57,7 @@ public class InMemoryHistoryManager implements HistoryManager {
      */
     @Override
     public Collection<TaskItem> getHistory() {
-        return new ArrayList<>(historyList);
+        return new ArrayList<>(getTasks());
     }
 
 
@@ -67,6 +65,11 @@ public class InMemoryHistoryManager implements HistoryManager {
      * Добавление задачи в конец списка
      */
     public void linkLast(TaskItem task) {
+        if (historyMap.containsKey(task.getTaskId())) {
+            removeNode(historyMap.get(task.getTaskId()));
+            historyMap.remove(task.getTaskId());
+        }
+        //Аналог LinkedList linkLast
         final Node<TaskItem> oldTail = tail;
         final Node<TaskItem> newNode = new Node<>(task, tail, null);
         tail = newNode;
@@ -75,9 +78,51 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (oldTail == null) {
             head = newNode;
         } else {
-            oldTail.prev = newNode;
+            oldTail.setNext(newNode);
         }
         size++;
+    }
+
+    /**
+     * Удаление узла связанного списка
+     */
+    public void removeNode(Node<TaskItem> node) {
+        //Аналог LinkedList unlink
+        final Node<TaskItem> next = node.getNext();
+        final Node<TaskItem> prev = node.getPrev();
+
+        if (prev == null) {
+            head = next;
+        } else {
+            prev.setNext(next);
+            node.setPrev(null);
+        }
+
+        if (next == null) {
+            tail = prev;
+        } else {
+            next.setPrev(prev);
+            node.setNext(null);
+        }
+
+        node.setData(null);
+        size--;
+    }
+
+    /**
+     * Собирает все просмотренные задачи в List, сохраняя последовательность просмотров
+     *
+     * @return List
+     */
+    public List<TaskItem> getTasks() {
+        List<TaskItem> linkedList = new LinkedList<>();
+        //Цикл по связанному списку от Head до Tail
+        Node<TaskItem> node = head;
+        while (node != null) {
+            linkedList.add(node.getData());
+            node = node.getNext();
+        }
+        return linkedList;
     }
 
     /**
@@ -87,20 +132,6 @@ public class InMemoryHistoryManager implements HistoryManager {
      */
     public int sizeHistory() {
         return size;
-    }
-
-    /**
-     * Удаление узла связанного списка
-     */
-    public void removeNode(Node node) {
-
-    }
-
-    /**
-     *
-     */
-    public List<TaskItem> getTasks() {
-        return null;
     }
 
 }

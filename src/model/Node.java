@@ -1,14 +1,14 @@
 package model;
 
 /**
- * Узел списка
+ * Узел списка просмотренных задач
  *
  */
 
 public class Node <T>{
-    TaskItem data;
-    public Node<T> next;
-    public Node<T> prev;
+    private TaskItem data;
+    private Node<T> next;
+    private Node<T> prev;
 
     public Node(TaskItem data, Node<T> prev, Node<T> next) {
         this.data = data;
