@@ -16,7 +16,7 @@ class SubtaskTest {
     void testToString() {
         Subtask subtask = new Subtask(0, "Наименование", "Описание", Status.NEW, 1);
         String subtaskSaved = "Подзадача{Идентификатор=0 Идентификатор эпик-задачи=1, Наименование='Наименование', " +
-                "Описание='Описание', Статус='Новая задача'}";
+                "Описание='Описание', Статус='NEW'}";
         Assertions.assertEquals(subtask.toString(), subtaskSaved, "Значения не равны");
     }
 }
