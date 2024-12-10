@@ -1,8 +1,7 @@
 package service;
 
 import model.*;
-import util.InMemoryHistoryManager;
-import util.Managers;
+import util.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,9 +11,9 @@ import java.util.Map;
 public class InMemoryTaskManager implements TaskManager {
     private int id = 0;
 
-    private Map<Integer, Task> taskMap = new HashMap<>();
-    private Map<Integer, Epic> epicMap = new HashMap<>();
-    private Map<Integer, Subtask> subtaskMap = new HashMap<>();
+    private final Map<Integer, Task> taskMap = new HashMap<>();
+    private final Map<Integer, Epic> epicMap = new HashMap<>();
+    private final Map<Integer, Subtask> subtaskMap = new HashMap<>();
 
     HistoryManager historyManager = Managers.getDefaultHistory();
 
@@ -60,6 +59,10 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public void deleteTask() {
+        // Удаление истории просмотров
+        for (int taskId : taskMap.keySet()) {
+            historyManager.remove(taskId);
+        }
         taskMap.clear();
     }
 
@@ -68,6 +71,14 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public void deleteEpic() {
+        // Удаление истории просмотров эпиков
+        for (int epicId : epicMap.keySet()) {
+            historyManager.remove(epicId);
+        }
+        // Удаление истории просмотров подзадач
+        for (int subtaskId : subtaskMap.keySet()) {
+            historyManager.remove(subtaskId);
+        }
         subtaskMap.clear(); //Удаление подзадач
         epicMap.clear(); //Удаление эпиков
     }
@@ -77,6 +88,10 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public void deleteSubtask() {
+        // Удаление истории просмотров подзадач
+        for (int subtaskId : subtaskMap.keySet()) {
+            historyManager.remove(subtaskId);
+        }
         //Удаление подзадач
         subtaskMap.clear();
         //Удаление подзадач из всех эпиков обновление статуса в эпиках
@@ -334,6 +349,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * Список просмотренных задач
+     *
      * @return Collection TaskItem
      */
     public Collection<TaskItem> getHistory() {

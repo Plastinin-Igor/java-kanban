@@ -46,8 +46,10 @@ public class InMemoryHistoryManager implements HistoryManager {
      */
     @Override
     public void remove(int id) {
-        removeNode(historyMap.get(id));
-        historyMap.remove(id);
+        if (historyMap.containsKey(id)) {
+            removeNode(historyMap.get(id));
+            historyMap.remove(id);
+        }
     }
 
     /**
@@ -64,7 +66,9 @@ public class InMemoryHistoryManager implements HistoryManager {
     /**
      * Добавление задачи в конец списка
      */
-    public void linkLast(TaskItem task) {
+    void linkLast(TaskItem task) {
+        //Если задача уже есть в просмотренных,
+        // то удалим ее и добавим в коенц новый просмотр
         if (historyMap.containsKey(task.getTaskId())) {
             removeNode(historyMap.get(task.getTaskId()));
             historyMap.remove(task.getTaskId());
@@ -86,7 +90,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     /**
      * Удаление узла связанного списка
      */
-    public void removeNode(Node<TaskItem> node) {
+    void removeNode(Node<TaskItem> node) {
         //Аналог LinkedList unlink
         final Node<TaskItem> next = node.getNext();
         final Node<TaskItem> prev = node.getPrev();
@@ -114,7 +118,7 @@ public class InMemoryHistoryManager implements HistoryManager {
      *
      * @return List
      */
-    public List<TaskItem> getTasks() {
+    List<TaskItem> getTasks() {
         List<TaskItem> linkedList = new LinkedList<>();
         //Цикл по связанному списку от Head до Tail
         Node<TaskItem> node = head;
@@ -130,7 +134,7 @@ public class InMemoryHistoryManager implements HistoryManager {
      *
      * @return int
      */
-    public int sizeHistory() {
+    int sizeHistory() {
         return size;
     }
 

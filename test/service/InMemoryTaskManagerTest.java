@@ -8,12 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest {
 
     InMemoryTaskManager taskManager = new InMemoryTaskManager();
-    TaskItem task, epic, subtask;
+
 
     Task taskObj = new Task("Задача № 1", "Описание задачи №1", Status.NEW);
     Epic epicObj = new Epic("Эпик-задача № 1", "Описание эпик-задачи №1");
