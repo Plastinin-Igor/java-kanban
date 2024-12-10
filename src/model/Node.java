@@ -2,10 +2,9 @@ package model;
 
 /**
  * Узел списка просмотренных задач
- *
  */
 
-public class Node <T>{
+public class Node<T> {
     private TaskItem data;
     private Node<T> next;
     private Node<T> prev;

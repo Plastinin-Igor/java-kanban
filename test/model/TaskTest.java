@@ -14,7 +14,7 @@ class TaskTest {
 
 
     @Test
-    // Экземпляры класса Epic равны друг другу, если равен их id;
+        // Экземпляры класса Epic равны друг другу, если равен их id;
     void shouldBeEqualInstancesOfTheTaskClassById() {
         TaskItem task;
         TaskItem savedTask;

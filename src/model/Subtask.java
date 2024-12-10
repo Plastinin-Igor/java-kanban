@@ -1,7 +1,8 @@
 package model;
 
-public class Subtask extends TaskItem{
+public class Subtask extends TaskItem {
     private int epicId;
+
     public Subtask(int taskId, String taskName, String taskDescription, Status taskStatus, int epicId) {
         super(taskId, taskName, taskDescription, taskStatus);
         this.epicId = epicId;
