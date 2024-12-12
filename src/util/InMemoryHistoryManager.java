@@ -1,11 +1,10 @@
 package util;
 
 import model.HistoryManager;
-import model.Task;
+import model.Node;
 import model.TaskItem;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Управление историей просмотров
@@ -15,10 +14,16 @@ import java.util.Collection;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private ArrayList<TaskItem> historyList;
+    private final HashMap<Integer, Node<TaskItem>> historyMap;
+
+    //Указатели на первый и последний элемент списка
+    private Node<TaskItem> head;
+    private Node<TaskItem> tail;
+    private int size = 0;
+
 
     public InMemoryHistoryManager() {
-        this.historyList = new ArrayList<>();
+        this.historyMap = new HashMap<>();
     }
 
     /**
@@ -29,10 +34,22 @@ public class InMemoryHistoryManager implements HistoryManager {
      */
     @Override
     public void add(TaskItem task) {
-        if (historyList.size() == 10) {
-            historyList.remove(0);
+        if (task != null) {
+            linkLast(task);
         }
-        historyList.add(task);
+    }
+
+    /**
+     * Удаление задачи из просмотра
+     *
+     * @param id int
+     */
+    @Override
+    public void remove(int id) {
+        if (historyMap.containsKey(id)) {
+            removeNode(historyMap.get(id));
+            historyMap.remove(id);
+        }
     }
 
     /**
@@ -42,6 +59,87 @@ public class InMemoryHistoryManager implements HistoryManager {
      */
     @Override
     public Collection<TaskItem> getHistory() {
-        return new ArrayList<>(historyList);
+        return getTasks();
     }
+
+
+    /**
+     * Добавление задачи в конец списка
+     */
+    private void linkLast(TaskItem task) {
+        //Если задача уже есть в просмотренных,
+        // то удалим ее и добавим в коенц новый просмотр
+        if (historyMap.containsKey(task.getTaskId())) {
+            removeNode(historyMap.get(task.getTaskId()));
+            historyMap.remove(task.getTaskId());
+        }
+        //Аналог LinkedList linkLast
+        final Node<TaskItem> oldTail = tail;
+        final Node<TaskItem> newNode = new Node<>(task, tail, null);
+        tail = newNode;
+        historyMap.put(task.getTaskId(), newNode);
+
+        if (oldTail == null) {
+            head = newNode;
+        } else {
+            oldTail.setNext(newNode);
+        }
+        size++;
+    }
+
+    /**
+     * Удаление узла связанного списка
+     */
+    private void removeNode(Node<TaskItem> node) {
+        //Аналог LinkedList unlink
+        final Node<TaskItem> next = node.getNext();
+        final Node<TaskItem> prev = node.getPrev();
+
+        if (prev == null) {
+            head = next;
+            if (head != null) {
+                head.setPrev(null);
+            }
+        } else {
+            prev.setNext(next);
+        }
+
+        if (next == null) {
+            tail = prev;
+            if (tail != null) {
+                tail.setNext(null);
+            }
+        } else {
+            next.setPrev(prev);
+        }
+
+        node.setData(null);
+        size--;
+    }
+
+    /**
+     * Собирает все просмотренные задачи в List, сохраняя последовательность просмотров
+     *
+     * @return List
+     */
+    private List<TaskItem> getTasks() {
+        List<TaskItem> linkedList = new LinkedList<>();
+        //Цикл по связанному списку от Head до Tail
+        Node<TaskItem> node = head;
+        while (node != null) {
+            linkedList.add(node.getData());
+            node = node.getNext();
+        }
+        return linkedList;
+    }
+
+    /**
+     * Размер связанного списка
+     *
+     * @return int
+     */
+    int sizeHistory() {
+        return size;
+    }
+
 }

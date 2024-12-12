@@ -1,6 +1,6 @@
 package model;
 
-public class Task extends TaskItem{
+public class Task extends TaskItem {
     public Task(int taskId, String taskName, String taskDescription, Status taskStatus) {
         super(taskId, taskName, taskDescription, taskStatus);
     }

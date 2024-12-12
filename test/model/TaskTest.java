@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import service.InMemoryTaskManager;
 
 import java.util.Collection;
-import java.util.List;
+
 
 class TaskTest {
 
@@ -14,7 +14,7 @@ class TaskTest {
 
 
     @Test
-    // Экземпляры класса Epic равны друг другу, если равен их id;
+        // Экземпляры класса Epic равны друг другу, если равен их id;
     void shouldBeEqualInstancesOfTheTaskClassById() {
         TaskItem task;
         TaskItem savedTask;
