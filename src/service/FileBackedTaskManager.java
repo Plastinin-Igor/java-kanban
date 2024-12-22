@@ -2,6 +2,8 @@ package service;
 
 import model.*;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -111,9 +113,44 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     /**
+     * Сохранение задачи в строку
+     *
+     * @param task TaskItem
+     * @return String
+     */
+    private String toString(TaskItem task) {
+        return null;
+    }
+
+    /**
+     * Создание задачи из строки
+     *
+     * @param value String
+     * @return TaskItem
+     */
+    private TaskItem fromString(String value) {
+        return null;
+    }
+
+
+    /**
      * Сохраняет текущее состояние менеджера в указанный файл
      */
-    private void save() {
-
+    public void save() {
+        String fileName = "TaskManagerData.csv";
+        try (FileWriter fileWriter = new FileWriter(fileName, true)) {
+            //Запись в файл заголовка
+            fileWriter.write("id,type,name,status,description,epic\n");
+            //Запись данных
+            ArrayList<TaskItem> taskList = new ArrayList<>(getListTask());
+            for (TaskItem task : taskList) {
+                fileWriter.write(task.getTaskId() + "," + TypesOfTasks.TASK + "," + task.getTaskName() + "," + task.getTaskStatus()
+                        + "," + task.getTaskDescription() + "," + " \n");
+            }
+        } catch (IOException e) {
+            System.out.println("Ошибка обработки файла " + fileName + ": " + e.getMessage());
+        }
     }
+
+
 }
