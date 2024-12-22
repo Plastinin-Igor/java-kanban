@@ -7,10 +7,9 @@ import java.util.Collection;
 
 /**
  * Класс менеджера, который после каждой операции автоматически сохраняет все задачи и их состояние в специальный файл
- *
  */
 
-public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager{
+public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
     @Override
     public Collection<Task> getListTask() {
         return super.getListTask();
@@ -109,5 +108,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     @Override
     public Collection<TaskItem> getHistory() {
         return super.getHistory();
+    }
+
+    /**
+     * Сохраняет текущее состояние менеджера в указанный файл
+     */
+    private void save() {
+
     }
 }
