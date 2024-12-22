@@ -121,8 +121,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
      * @param task TaskItem
      * @return String
      */
-    private String toString(TaskItem task) {
-        return null;
+    private String toString(TaskItem task, TypesOfTasks type, int epicId) {
+        return String.format("%s,%s,%s,%s,%s,%s",
+                task.getTaskId(), type, task.getTaskName(),
+                task.getTaskStatus(), task.getTaskDescription(), epicId);
     }
 
     /**
@@ -145,7 +147,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             //Запись в файл заголовка
             fileWriter.write("id,type,name,status,description,epic\n");
             //Запись данных
-
+            for(Task task : super.getListTask()) {
+                fileWriter.write(toString(task,TypesOfTasks.TASK, 0));
+            }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка обработки файла: " + e.getMessage());
         }
