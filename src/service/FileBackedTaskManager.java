@@ -1,5 +1,6 @@
 package service;
 
+import exceptions.ManagerSaveException;
 import model.*;
 
 import java.io.FileWriter;
@@ -59,7 +60,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     @Override
     public Task addNewTask(Task task) {
-        return super.addNewTask(task);
+        super.addNewTask(task);
+        save();
+        return task;
     }
 
     @Override
@@ -142,13 +145,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             //Запись в файл заголовка
             fileWriter.write("id,type,name,status,description,epic\n");
             //Запись данных
-            ArrayList<TaskItem> taskList = new ArrayList<>(getListTask());
-            for (TaskItem task : taskList) {
-                fileWriter.write(task.getTaskId() + "," + TypesOfTasks.TASK + "," + task.getTaskName() + "," + task.getTaskStatus()
-                        + "," + task.getTaskDescription() + "," + " \n");
-            }
+
         } catch (IOException e) {
-            System.out.println("Ошибка обработки файла " + fileName + ": " + e.getMessage());
+            throw new ManagerSaveException("Ошибка обработки файла: " + e.getMessage());
         }
     }
 
