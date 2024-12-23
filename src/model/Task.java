@@ -18,4 +18,15 @@ public class Task extends TaskItem {
                 ", Статус='" + super.getTaskStatus() + '\'' +
                 '}';
     }
+
+    /**
+     * Строка для записи данных в CSV файл
+     *
+     * @return String
+     */
+    public String toStringForFileCSV() {
+        return String.format("%s,%s,%s,%s,%s\n", super.getTaskId(), TypesOfTasks.TASK, super.getTaskName(),
+                super.getTaskStatus(), super.getTaskDescription());
+    }
+
 }

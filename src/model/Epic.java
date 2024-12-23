@@ -9,8 +9,16 @@ public class Epic extends TaskItem {
         super(taskId, taskName, taskDescription);
     }
 
+    public Epic(String taskName, String taskDescription, Status taskStatus) {
+        super(taskName, taskDescription, taskStatus);
+    }
+
     public Epic(String taskName, String taskDescription) {
         super(taskName, taskDescription);
+    }
+
+    public Epic(int taskId, String taskName, String taskDescription, Status taskStatus) {
+        super(taskId, taskName, taskDescription, taskStatus);
     }
 
     public ArrayList<Integer> getSubtaskListId() {
@@ -52,4 +60,15 @@ public class Epic extends TaskItem {
                 ", Подзадача='" + subtaskListId + '\'' +
                 '}';
     }
+
+    /**
+     * Строка для записи данных в CSV файл
+     *
+     * @return String
+     */
+    public String toStringForFileCSV() {
+        return String.format("%s,%s,%s,%s,%s\n", super.getTaskId(), TypesOfTasks.EPIC, super.getTaskName(),
+                super.getTaskStatus(), super.getTaskDescription());
+    }
+
 }
