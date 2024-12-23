@@ -141,7 +141,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     /**
-     * Сохранение текущего состояние менеджера в указанный файл
+     * Сохранение текущего состояния менеджера в указанный файл
      */
     private void save() {
         try (FileWriter fileWriter = new FileWriter(path, StandardCharsets.UTF_8)) {
@@ -231,5 +231,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 return null;
             }
         }
+    }
+
+    public static void main(String[] args) {
+        FileBackedTaskManager manager = new FileBackedTaskManager("TaskManagerData.csv");
+        manager.addNewTask(new Task("Дочитать книгу Герберт Шилдт Java 8 - Полное руководство",
+                "Герберт Шилдт Java 8. Полное руководство", Status.NEW));
+        manager.addNewEpic(new Epic("Пройти курс Java-разработчик",
+                "Пройти курс Java-разработчик"));
     }
 }
