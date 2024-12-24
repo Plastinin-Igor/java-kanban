@@ -401,7 +401,7 @@ public class InMemoryTaskManager implements TaskManager {
      */
     protected Subtask addSubtask(Subtask subtask) {
         if (epicMap.containsKey(subtask.getEpicId())) {
-            epicMap.get(subtask.getEpicId()).addNewSubtaskId(id); // добавление id подзадачи в эпик
+            epicMap.get(subtask.getEpicId()).addNewSubtaskId(subtask.getTaskId()); // добавление id подзадачи в эпик
             subtaskMap.put(subtask.getTaskId(), subtask);
             updateEpicStatus(epicMap.get(subtask.getEpicId())); // обновление статуса в эпик-задаче
             return subtask;
