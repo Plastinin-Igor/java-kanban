@@ -6,6 +6,7 @@ public class Main {
     public static void main(String[] args) {
 
         TaskManager taskManager = Managers.getDefault();
+
         TaskItem task1, task2, epic1, epic2, subtask1, subtask2, subtask3;
 
         //Задача 1
@@ -38,6 +39,7 @@ public class Main {
         //Эпик 2
         Epic epicObj2 = new Epic("Эпик-задача № 2", "Описание эпик-задачи №2");
         epic2 = taskManager.addNewEpic(epicObj2);
+
 
         //НАПЕЧАТАТЬ ВСЕ ЗАДАЧИ
         System.out.println("01. ДОБАВИЛИ ЗАДАЧИ/ЭПИКИ/ПОДЗАДАЧИ. ПРОСМОТРОВ ПОКА НЕТ:");
@@ -78,30 +80,6 @@ public class Main {
         taskManager.getSubtaskById(subtask3.getTaskId());
         printHistory(taskManager);
 
-
-        System.out.println();
-        System.out.println("07. УДАЛИЛИ ЗАДАЧУ № 1:");
-        System.out.println("-----------------------");
-        taskManager.deleteTaskById(task1.getTaskId());
-        printHistory(taskManager);
-
-        System.out.println();
-        System.out.println("08. УДАЛИЛИ ЭПИК № 1:");
-        System.out.println("-----------------------");
-        taskManager.deleteEpicById(epic1.getTaskId());
-        printHistory(taskManager);
-
-        System.out.println();
-        System.out.println("09. УДАЛИЛИ ЭПИК № 2:");
-        System.out.println("-----------------------");
-        taskManager.deleteEpicById(epic2.getTaskId());
-        printHistory(taskManager);
-
-        System.out.println();
-        System.out.println("10. УДАЛИЛИ ЗАДАЧУ № 2:");
-        System.out.println("-----------------------");
-        taskManager.deleteTaskById(taskObj2.getTaskId());
-        printHistory(taskManager);
 
     }
 
