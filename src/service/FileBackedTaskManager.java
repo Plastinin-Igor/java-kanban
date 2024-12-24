@@ -5,8 +5,7 @@ import model.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
+
 
 /**
  * Класс менеджера, который после каждой операции автоматически сохраняет все задачи и их состояние в специальный файл
@@ -20,21 +19,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.path = path;
         // Восстановление данных менеджера из файла
         loadFromFile();
-    }
-
-    @Override
-    public Collection<Task> getListTask() {
-        return super.getListTask();
-    }
-
-    @Override
-    public Collection<Epic> getListEpic() {
-        return super.getListEpic();
-    }
-
-    @Override
-    public Collection<Subtask> getListSubtask() {
-        return super.getListSubtask();
     }
 
     @Override
@@ -53,21 +37,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void deleteSubtask() {
         super.deleteSubtask();
         save();
-    }
-
-    @Override
-    public Task getTaskById(int taskId) {
-        return super.getTaskById(taskId);
-    }
-
-    @Override
-    public Epic getEpicById(int taskId) {
-        return super.getEpicById(taskId);
-    }
-
-    @Override
-    public Subtask getSubtaskById(int taskId) {
-        return super.getSubtaskById(taskId);
     }
 
     @Override
@@ -130,16 +99,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
-    @Override
-    public ArrayList<Subtask> getSubtaskByEpicId(int epicId) {
-        return super.getSubtaskByEpicId(epicId);
-    }
-
-    @Override
-    public Collection<TaskItem> getHistory() {
-        return super.getHistory();
-    }
-
     /**
      * Сохранение текущего состояния менеджера в указанный файл
      */
@@ -171,19 +130,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             try (BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
                 String line;
                 int rowIndex = 0;
+                int taskId = 0;
                 while ((line = br.readLine()) != null) {
                     if (rowIndex != 0) {
                         TaskItem taskItem = fromString(line);
                         if (taskItem instanceof Task) {
-                            super.addNewTask((Task) taskItem);
+                            super.addTask((Task) taskItem);
                         } else if (taskItem instanceof Epic) {
-                            super.addNewEpic((Epic) taskItem);
+                            super.addEpic((Epic) taskItem);
                         } else if (taskItem instanceof Subtask) {
-                            super.addNewSubtask((Subtask) taskItem);
+                            super.addSubtask((Subtask) taskItem);
+                        }
+                        if (taskItem.getTaskId() > taskId) {
+                            taskId = taskItem.getTaskId();
                         }
                     }
                     rowIndex++;
                 }
+                super.setId(taskId);
             } catch (IOException e) {
                 throw new ManagerSaveException("Ошибка чтения файла: " + e.getMessage());
             }
@@ -227,9 +191,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 epicId = Integer.parseInt(line[5]);
                 return new Subtask(id, name, description, status, epicId);
             }
-            default -> {
-                return null;
-            }
+            default -> throw new ManagerSaveException("Ошибка при восстановлении данных из файла " + path
+                    + ". Не определен тип задачи " + line[1] + ".");
         }
     }
 

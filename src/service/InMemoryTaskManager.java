@@ -25,6 +25,15 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     /**
+     * Актуализация счетчика Id при восстановлении данных из файла
+     *
+     * @param id int
+     */
+    protected void setId(int id) {
+        this.id = id;
+    }
+
+    /**
      * Получение списка задач
      *
      * @return List Task
@@ -355,4 +364,51 @@ public class InMemoryTaskManager implements TaskManager {
     public Collection<TaskItem> getHistory() {
         return historyManager.getHistory();
     }
+
+
+    /**
+     * Добавление обычной задачи;
+     * метод используется для восстановления данных из файла
+     *
+     * @param task Task
+     * @return Task
+     */
+
+    protected Task addTask(Task task) {
+        taskMap.put(task.getTaskId(), task);
+        return task;
+    }
+
+    /**
+     * Добавление эпик-задачи;
+     * метод используется для восстановления данных из файла
+     *
+     * @param epic Epic
+     * @return Epic
+     */
+
+    protected Epic addEpic(Epic epic) {
+        epicMap.put(epic.getTaskId(), epic);
+        return epic;
+    }
+
+    /**
+     * Добавление подзадачи в эпик-задачу;
+     * метод используется для восстановления данных из файла
+     *
+     * @param subtask Subtask
+     * @return Subtask
+     */
+    protected Subtask addSubtask(Subtask subtask) {
+        if (epicMap.containsKey(subtask.getEpicId())) {
+            epicMap.get(subtask.getEpicId()).addNewSubtaskId(id); // добавление id подзадачи в эпик
+            subtaskMap.put(subtask.getTaskId(), subtask);
+            updateEpicStatus(epicMap.get(subtask.getEpicId())); // обновление статуса в эпик-задаче
+            return subtask;
+        } else {
+            System.out.println("Не найден эпик с ID " + subtask.getEpicId());
+            return null;
+        }
+    }
+
 }
