@@ -29,7 +29,7 @@ public class Task extends TaskItem {
                 ", Наименование='" + super.getTaskName() + '\'' +
                 ", Описание='" + super.getTaskDescription() + '\'' +
                 ", Статус='" + super.getTaskStatus() + '\'' +
-                ", Продолжительность='" + super.getDuration().toMinutes() + " мин." +'\'' +
+                ", Продолжительность='" + super.getDuration().toMinutes() + " мин." + '\'' +
                 ", Дата и веремя, когда приступать к выполнению='" + super.getStartTime() + '\'' +
                 ", Дата и время завершения задачи='" + super.getEndTime() + '\'' +
                 '}';
