@@ -4,7 +4,14 @@ import model.*;
 import util.*;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Comparator;
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
 
 public class InMemoryTaskManager implements TaskManager {
     private int id = 0;
@@ -12,7 +19,6 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Task> taskMap = new HashMap<>();
     private final Map<Integer, Epic> epicMap = new HashMap<>();
     private final Map<Integer, Subtask> subtaskMap = new HashMap<>();
-
     //Отсортированные по полю startTime задачи, подзадачи, эпики
     private final Set<TaskItem> prioritizedTasksTree = new TreeSet<>(Comparator.comparing(TaskItem::getStartTime));
 
@@ -190,7 +196,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     /**
-     * Рассчет продолжительности эпика; определение даты начала и даты окончания
+     * Расчет продолжительности эпика; определение даты начала и даты окончания.
+     * Продолжительность эпика — сумма продолжительностей всех его подзадач.
+     * Время начала — дата старта самой ранней подзадачи, а время завершения
+     * — время окончания самой поздней из задач.
      *
      * @param epic Epic
      */
@@ -240,11 +249,19 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public Task addNewTask(Task task) {
-        generateIdentifier();
-        task.setTaskId(id);
-        taskMap.put(id, task);
-        prioritizedTasksTree.add(task);
-        return task;
+        boolean isIntersect = prioritizedTasksTree.stream()
+                .anyMatch(existingTask -> isIntersect(task, existingTask));
+        if (!isIntersect) {
+            generateIdentifier();
+            task.setTaskId(id);
+            taskMap.put(id, task);
+            if (task.getStartTime() != null) {
+                prioritizedTasksTree.add(task);
+            }
+            return task;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -270,14 +287,22 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask addNewSubtask(Subtask subtask) {
         if (epicMap.containsKey(subtask.getEpicId())) {
-            generateIdentifier();
-            subtask.setTaskId(id);
-            epicMap.get(subtask.getEpicId()).addNewSubtaskId(id); // добавление id подзадачи в эпик
-            subtaskMap.put(id, subtask);
-            updateEpicStatus(epicMap.get(subtask.getEpicId())); // обновление статуса в эпик-задаче
-            calculateTimeForEpic(epicMap.get(subtask.getEpicId()));
-            prioritizedTasksTree.add(subtask);
-            return subtask;
+            boolean isIntersect = prioritizedTasksTree.stream()
+                    .anyMatch(existingTask -> isIntersect(subtask, existingTask));
+            if (!isIntersect) {
+                generateIdentifier();
+                subtask.setTaskId(id);
+                epicMap.get(subtask.getEpicId()).addNewSubtaskId(id); // добавление id подзадачи в эпик
+                subtaskMap.put(id, subtask);
+                updateEpicStatus(epicMap.get(subtask.getEpicId())); // обновление статуса в эпик-задаче
+                calculateTimeForEpic(epicMap.get(subtask.getEpicId()));
+                if (subtask.getStartTime() != null) {
+                    prioritizedTasksTree.add(subtask);
+                }
+                return subtask;
+            } else {
+                return null;
+            }
         } else {
             System.out.println("Не найден эпик с ID " + subtask.getEpicId());
             return null;
@@ -294,8 +319,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task updateTask(Task task) {
         if (taskMap.containsKey(task.getTaskId())) {
-            taskMap.put(task.getTaskId(), task);
-            return task;
+            boolean isIntersect = prioritizedTasksTree.stream()
+                    .anyMatch(taskExisting -> isIntersect(task, taskExisting));
+            if (!isIntersect) {
+                taskMap.put(task.getTaskId(), task);
+                return task;
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
@@ -310,10 +341,16 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic updateEpic(Epic epic) {
         if (epicMap.containsKey(epic.getTaskId())) {
-            Epic epicLocal = epicMap.get(epic.getTaskId());
-            epicLocal.setTaskName(epic.getTaskName());
-            epicLocal.setTaskDescription(epic.getTaskDescription());
-            return epic;
+            boolean isIntersect = prioritizedTasksTree.stream()
+                    .anyMatch(existingTask -> isIntersect(epic, existingTask));
+            if (!isIntersect) {
+                Epic epicLocal = epicMap.get(epic.getTaskId());
+                epicLocal.setTaskName(epic.getTaskName());
+                epicLocal.setTaskDescription(epic.getTaskDescription());
+                return epic;
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
@@ -329,14 +366,20 @@ public class InMemoryTaskManager implements TaskManager {
     public Subtask updateSubtask(Subtask subtask) {
         // проверяем, есть ли такая подзадача
         if (subtaskMap.containsKey(subtask.getTaskId())) {
-            //проверяем равен ли epicId в новой подзадаче со значением epicId подзадачи
-            if (subtask.getEpicId() == subtaskMap.get(subtask.getTaskId()).getEpicId()) {
-                subtaskMap.put(subtask.getTaskId(), subtask);
-                updateEpicStatus(epicMap.get(subtask.getEpicId())); // обновление статуса в эпик-задаче
-                calculateTimeForEpic(epicMap.get(subtask.getEpicId()));
-                return subtask;
+            boolean isIntersect = prioritizedTasksTree.stream()
+                    .anyMatch(existing -> isIntersect(subtask, existing));
+            if (!isIntersect) {
+                //проверяем равен ли epicId в новой подзадаче со значением epicId подзадачи
+                if (subtask.getEpicId() == subtaskMap.get(subtask.getTaskId()).getEpicId()) {
+                    subtaskMap.put(subtask.getTaskId(), subtask);
+                    updateEpicStatus(epicMap.get(subtask.getEpicId())); // обновление статуса в эпик-задаче
+                    calculateTimeForEpic(epicMap.get(subtask.getEpicId()));
+                    return subtask;
+                } else {
+                    System.out.println("Подзадачи не переходят между Эпиками");
+                    return null;
+                }
             } else {
-                System.out.println("Подзадачи не переходят между Эпиками");
                 return null;
             }
         } else {
@@ -471,5 +514,4 @@ public class InMemoryTaskManager implements TaskManager {
             return null;
         }
     }
-
 }

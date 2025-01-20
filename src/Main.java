@@ -1,15 +1,26 @@
 import model.*;
 import util.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Main {
 
     public static void main(String[] args) {
 
         TaskManager taskManager = Managers.getDefault();
 
-        TaskItem task1, task2, epic1, epic2, subtask1, subtask2, subtask3;
+        Duration duration = Duration.ofMinutes(50);
+        LocalDateTime start = LocalDateTime.now();
 
-        //Задача 1
+        TaskItem task1, task2, epic1, epic2, subtask1, subtask2, subtask3;
+        taskManager.addNewTask(new Task("Задача № 1", "Описание задачи №1", Status.NEW, duration, start));
+        taskManager.addNewTask(new Task("Задача № 2", "Описание задачи №2", Status.NEW, duration, start.plusMinutes(51)));
+
+        printAllTasks(taskManager);
+
+
+/*        //Задача 1
         Task taskObj1 = new Task("Задача № 1", "Описание задачи №1", Status.NEW);
         task1 = taskManager.addNewTask(taskObj1);
 
@@ -79,7 +90,7 @@ public class Main {
         taskManager.getSubtaskById(subtask2.getTaskId());
         taskManager.getSubtaskById(subtask3.getTaskId());
         printHistory(taskManager);
-
+*/
 
     }
 
