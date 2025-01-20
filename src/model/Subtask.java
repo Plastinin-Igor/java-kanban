@@ -1,5 +1,8 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Subtask extends TaskItem {
     private final int epicId;
 
@@ -8,8 +11,20 @@ public class Subtask extends TaskItem {
         this.epicId = epicId;
     }
 
+    public Subtask(int taskId, String taskName, String taskDescription, Status taskStatus, int epicId,
+                   Duration duration, LocalDateTime startTime) {
+        super(taskId, taskName, taskDescription, taskStatus, duration, startTime);
+        this.epicId = epicId;
+    }
+
     public Subtask(String taskName, String taskDescription, Status taskStatus, int epicId) {
         super(taskName, taskDescription, taskStatus);
+        this.epicId = epicId;
+    }
+
+    public Subtask(String taskName, String taskDescription, Status taskStatus, int epicId,
+                   Duration duration, LocalDateTime startTime) {
+        super(taskName, taskDescription, taskStatus, duration, startTime);
         this.epicId = epicId;
     }
 
@@ -25,6 +40,9 @@ public class Subtask extends TaskItem {
                 ", Наименование='" + super.getTaskName() + '\'' +
                 ", Описание='" + super.getTaskDescription() + '\'' +
                 ", Статус='" + super.getTaskStatus() + '\'' +
+                ", Продолжительность='" + super.getDuration().toMinutes() + '\'' +
+                ", Дата и веремя, когда приступать к выполнению='" + super.getStartTime() + '\'' +
+                ", Дата и время завершения задачи='" + super.getEndTime() + '\'' +
                 '}';
     }
 

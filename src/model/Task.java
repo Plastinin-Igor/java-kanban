@@ -1,12 +1,25 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Task extends TaskItem {
     public Task(int taskId, String taskName, String taskDescription, Status taskStatus) {
         super(taskId, taskName, taskDescription, taskStatus);
     }
 
+    public Task(int taskId, String taskName, String taskDescription, Status taskStatus,
+                Duration duration, LocalDateTime startTime) {
+        super(taskId, taskName, taskDescription, taskStatus, duration, startTime);
+    }
+
     public Task(String taskName, String taskDescription, Status taskStatus) {
         super(taskName, taskDescription, taskStatus);
+    }
+
+    public Task(String taskName, String taskDescription, Status taskStatus,
+                Duration duration, LocalDateTime startTime) {
+        super(taskName, taskDescription, taskStatus, duration, startTime);
     }
 
     @Override
@@ -16,6 +29,9 @@ public class Task extends TaskItem {
                 ", Наименование='" + super.getTaskName() + '\'' +
                 ", Описание='" + super.getTaskDescription() + '\'' +
                 ", Статус='" + super.getTaskStatus() + '\'' +
+                ", Продолжительность='" + super.getDuration().toMinutes() + " мин." +'\'' +
+                ", Дата и веремя, когда приступать к выполнению='" + super.getStartTime() + '\'' +
+                ", Дата и время завершения задачи='" + super.getEndTime() + '\'' +
                 '}';
     }
 

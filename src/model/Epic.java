@@ -1,28 +1,44 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Epic extends TaskItem {
     private final ArrayList<Integer> subtaskListId = new ArrayList<>();
+    private LocalDateTime endTime;
 
     public Epic(int taskId, String taskName, String taskDescription) {
         super(taskId, taskName, taskDescription);
+        super.setDuration(Duration.ofMinutes(0));
     }
 
     public Epic(String taskName, String taskDescription, Status taskStatus) {
         super(taskName, taskDescription, taskStatus);
+        super.setDuration(Duration.ofMinutes(0));
     }
 
     public Epic(String taskName, String taskDescription) {
         super(taskName, taskDescription);
+        super.setDuration(Duration.ofMinutes(0));
     }
 
     public Epic(int taskId, String taskName, String taskDescription, Status taskStatus) {
         super(taskId, taskName, taskDescription, taskStatus);
+        super.setDuration(Duration.ofMinutes(0));
     }
 
     public ArrayList<Integer> getSubtaskListId() {
         return subtaskListId;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     /**
@@ -58,6 +74,9 @@ public class Epic extends TaskItem {
                 ", Описание='" + super.getTaskDescription() + '\'' +
                 ", Статус='" + super.getTaskStatus() + '\'' +
                 ", Подзадача='" + subtaskListId + '\'' +
+                ", Продолжительность='" + super.getDuration().toMinutes() + '\'' +
+                ", Дата и веремя, когда приступать к выполнению='" + super.getStartTime() + '\'' +
+                ", Дата и время завершения задачи='" + getEndTime() + '\'' +
                 '}';
     }
 

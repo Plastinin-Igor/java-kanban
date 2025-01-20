@@ -1,6 +1,8 @@
 package model;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
 
 /**
  * Методы, которые должны быть у любого объекта-менеджера
@@ -151,4 +153,11 @@ public interface TaskManager {
      * @return Collection TaskItem
      */
     Collection<TaskItem> getHistory();
+
+    /**
+     * Список задач в порядке приоритета
+     *
+     * @return TreeSet TaskItem
+     */
+    public List<TaskItem> getPrioritizedTasks();
 }

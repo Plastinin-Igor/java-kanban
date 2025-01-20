@@ -1,12 +1,17 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
-public abstract class TaskItem {
+public abstract class TaskItem  implements Comparable<TaskItem> {
     private int taskId; // Уникальный идентификационный номер задачи
     private String taskName; // Название, кратко описывающее суть задачи
     private String taskDescription; // Описание, в котором раскрываются детали
     private Status taskStatus; // Статус, отображающий прогресс задачи
+    private Duration duration; // Продолжительность задачи, оценка того, сколько времени она займёт в минутах
+    private LocalDateTime startTime; // Дата и время, когда предполагается приступить к выполнению задачи
+
 
     public TaskItem(int taskId, String taskName, String taskDescription, Status taskStatus) {
         this.taskId = taskId;
@@ -32,6 +37,25 @@ public abstract class TaskItem {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskStatus = Status.NEW;
+    }
+
+    public TaskItem(String taskName, String taskDescription, Status taskStatus, Duration duration,
+                    LocalDateTime startTime) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.taskStatus = taskStatus;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
+    public TaskItem(int taskId, String taskName, String taskDescription, Status taskStatus, Duration duration,
+                    LocalDateTime startTime) {
+        this.taskId = taskId;
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.taskStatus = taskStatus;
+        this.duration = duration;
+        this.startTime = startTime;
     }
 
     public int getTaskId() {
@@ -66,6 +90,26 @@ public abstract class TaskItem {
         this.taskStatus = taskStatus;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plusMinutes(duration.toMinutes());
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
@@ -88,5 +132,10 @@ public abstract class TaskItem {
                 ", taskDescription='" + taskDescription + '\'' +
                 ", taskStatus=" + taskStatus +
                 '}';
+    }
+
+    @Override
+    public int compareTo(TaskItem other) {
+        return this.startTime.compareTo(other.startTime);
     }
 }
