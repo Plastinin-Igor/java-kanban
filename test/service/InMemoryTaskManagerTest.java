@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Assertions;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -18,7 +20,8 @@ class InMemoryTaskManagerTest {
     Epic epicObj = new Epic("Эпик-задача № 1", "Описание эпик-задачи №1");
     Epic epic1 = taskManager.addNewEpic(epicObj);
     Subtask subtaskObj = new Subtask("Первая подзадача в эпике № 1", "Первая подзадача в эпике № 1",
-            Status.NEW, epic1.getTaskId());
+            Status.NEW, epic1.getTaskId(), Duration.ofMinutes(10),
+            LocalDateTime.of(2025, 1, 1, 10, 0));
 
     @Test
     void getListTask() {
@@ -151,11 +154,17 @@ class InMemoryTaskManagerTest {
     @Test
     void updateSubtask() {
         Subtask subtask = taskManager.addNewSubtask(subtaskObj);
+
         int taskId = subtask.getTaskId();
+
         Status statusEpicBeforeUpdate = epicObj.getTaskStatus();
-        Subtask subtaskUpdate = new Subtask(taskId, "Первая подзадача в эпике № 1",
-                "Первая подзадача в эпике № 1", Status.DONE, epicObj.getTaskId());
+
+        Subtask subtaskUpdate = new Subtask(taskId, "Первая подзадача в эпике № 1", "Первая подзадача в эпике № 1",
+                Status.DONE, epic1.getTaskId(), Duration.ofMinutes(10),
+                LocalDateTime.of(2025, 1, 1, 10, 0));
+
         taskManager.updateSubtask(subtaskUpdate);
+
         Subtask subtaskAfterUpdate = taskManager.getSubtaskById(taskId);
 
         Assertions.assertEquals(subtaskUpdate, subtaskAfterUpdate, "Сабтаски не совпадают");

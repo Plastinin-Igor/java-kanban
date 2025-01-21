@@ -2,6 +2,7 @@ package model;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public abstract class TaskItem  implements Comparable<TaskItem> {
@@ -11,7 +12,7 @@ public abstract class TaskItem  implements Comparable<TaskItem> {
     private Status taskStatus; // Статус, отображающий прогресс задачи
     private Duration duration; // Продолжительность задачи, оценка того, сколько времени она займёт в минутах
     private LocalDateTime startTime; // Дата и время, когда предполагается приступить к выполнению задачи
-
+    public static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
     public TaskItem(int taskId, String taskName, String taskDescription, Status taskStatus) {
         this.taskId = taskId;

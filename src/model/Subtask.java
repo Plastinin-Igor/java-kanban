@@ -28,6 +28,7 @@ public class Subtask extends TaskItem {
         this.epicId = epicId;
     }
 
+
     public int getEpicId() {
         return epicId;
     }
@@ -41,7 +42,7 @@ public class Subtask extends TaskItem {
                 ", Описание='" + super.getTaskDescription() + '\'' +
                 ", Статус='" + super.getTaskStatus() + '\'' +
                 ", Продолжительность='" + super.getDuration().toMinutes() + '\'' +
-                ", Дата и веремя, когда приступать к выполнению='" + super.getStartTime() + '\'' +
+                ", Дата и веремя начала задачи='" + super.getStartTime() + '\'' +
                 ", Дата и время завершения задачи='" + super.getEndTime() + '\'' +
                 '}';
     }
@@ -52,8 +53,9 @@ public class Subtask extends TaskItem {
      * @return String
      */
     public String toStringForFileCSV() {
-        return String.format("%s,%s,%s,%s,%s,%s\n", super.getTaskId(), TypesOfTasks.SUBTASK, super.getTaskName(),
-                super.getTaskStatus(), super.getTaskDescription(), getEpicId());
+        return String.format("%s,%s,%s,%s,%s,%s,%s,%s\n", super.getTaskId(), TypesOfTasks.SUBTASK, super.getTaskName(),
+                super.getTaskStatus(), super.getTaskDescription(), super.getDuration().toMinutes(),
+                super.getStartTime().format(DATE_TIME_FORMAT), getEpicId());
     }
 
 }

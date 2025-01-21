@@ -1,4 +1,5 @@
 import model.*;
+import service.FileBackedTaskManager;
 import util.*;
 
 import java.time.Duration;
@@ -9,15 +10,50 @@ public class Main {
     public static void main(String[] args) {
 
         TaskManager taskManager = Managers.getDefault();
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager("D:\\Java\\java-kanban\\TaskManagerData.csv");
 
-        Duration duration = Duration.ofMinutes(50);
+
+        Duration duration = Duration.ofMinutes(51);
         LocalDateTime start = LocalDateTime.now();
 
         TaskItem task1, task2, epic1, epic2, subtask1, subtask2, subtask3;
         taskManager.addNewTask(new Task("Задача № 1", "Описание задачи №1", Status.NEW, duration, start));
         taskManager.addNewTask(new Task("Задача № 2", "Описание задачи №2", Status.NEW, duration, start.plusMinutes(51)));
 
-        printAllTasks(taskManager);
+        fileBackedTaskManager.addNewTask(new Task("Задача № 1", "Описание задачи №1", Status.NEW, duration, start));
+        fileBackedTaskManager.addNewTask(new Task("Задача № 2", "Описание задачи №2", Status.NEW, duration, start.plusMinutes(51)));
+
+        //Эпик 1
+        Epic epicObj1 = new Epic("Эпик-задача № 1", "Описание эпик-задачи №1");
+        epic1 = fileBackedTaskManager.addNewEpic(epicObj1);
+
+        //Подзадача 1.1
+        Subtask subtaskObj1 = new Subtask("Первая подзадача в эпике № 1",
+                "Первая подзадача в эпике № 1", Status.NEW, epic1.getTaskId(), duration, start.plusMinutes(120));
+        subtask1 = fileBackedTaskManager.addNewSubtask(subtaskObj1);
+
+        //Подзадача 1.2
+        Subtask subtaskObj2 = new Subtask("Вторая подзадача в эпике № 1",
+                "Вторая подзадача в эпике № 1", Status.NEW, epic1.getTaskId(), duration, start.plusMinutes(360));
+        subtask2 = fileBackedTaskManager.addNewSubtask(subtaskObj2);
+
+
+        printAllTasks(fileBackedTaskManager);
+
+
+        for (int i = 0; i < fileBackedTaskManager.getPrioritizedTasks().size(); i++) {
+            System.out.println(fileBackedTaskManager.getPrioritizedTasks().get(i));
+        }
+
+        System.out.println();
+        System.out.println("getSubtaskByEpicId:");
+        System.out.println(fileBackedTaskManager.getSubtaskByEpicId(3));
+
+
+        fileBackedTaskManager.deleteEpicById(3);
+        System.out.println();
+        System.out.println("getSubtaskByEpicId:");
+        System.out.println(fileBackedTaskManager.getSubtaskByEpicId(3));
 
 
 /*        //Задача 1

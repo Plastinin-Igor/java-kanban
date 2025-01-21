@@ -41,8 +41,8 @@ public class Task extends TaskItem {
      * @return String
      */
     public String toStringForFileCSV() {
-        return String.format("%s,%s,%s,%s,%s\n", super.getTaskId(), TypesOfTasks.TASK, super.getTaskName(),
-                super.getTaskStatus(), super.getTaskDescription());
+        return String.format("%s,%s,%s,%s,%s,%s,%s\n", super.getTaskId(), TypesOfTasks.TASK, super.getTaskName(),
+                super.getTaskStatus(), super.getTaskDescription(), super.getDuration().toMinutes(),
+                super.getStartTime().format(DATE_TIME_FORMAT));
     }
-
 }

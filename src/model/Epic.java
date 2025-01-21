@@ -28,6 +28,11 @@ public class Epic extends TaskItem {
         super.setDuration(Duration.ofMinutes(0));
     }
 
+    public Epic(int taskId, String taskName, String taskDescription, Status taskStatus, Duration duration,
+                LocalDateTime startTime) {
+        super(taskId, taskName, taskDescription, taskStatus, duration, startTime);
+    }
+
     public ArrayList<Integer> getSubtaskListId() {
         return subtaskListId;
     }
@@ -86,8 +91,12 @@ public class Epic extends TaskItem {
      * @return String
      */
     public String toStringForFileCSV() {
-        return String.format("%s,%s,%s,%s,%s\n", super.getTaskId(), TypesOfTasks.EPIC, super.getTaskName(),
-                super.getTaskStatus(), super.getTaskDescription());
+        String stringStartTime = "";
+        if (super.getStartTime() != null) {
+            stringStartTime = super.getStartTime().format(DATE_TIME_FORMAT);
+        }
+        return String.format("%s,%s,%s,%s,%s,%s,%s\n", super.getTaskId(), TypesOfTasks.EPIC, super.getTaskName(),
+                super.getTaskStatus(), super.getTaskDescription(), super.getDuration().toMinutes(),
+                stringStartTime);
     }
-
 }
