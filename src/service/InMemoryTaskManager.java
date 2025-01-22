@@ -184,15 +184,13 @@ public class InMemoryTaskManager implements TaskManager {
                 .peek(epicId -> {
                     historyManager.remove(epicId);
                     prioritizedTasksTree.remove(epicMap.get(epicId));
-                })
-                .count();
+                });
         // Удаление истории просмотров подзадач
         subtaskMap.keySet().stream()
                 .peek(subtaskId -> {
                     historyManager.remove(subtaskId);
                     prioritizedTasksTree.remove(subtaskMap.get(subtaskId));
-                })
-                .count();
+                });
 
         subtaskMap.clear(); //Удаление подзадач
         epicMap.clear(); //Удаление эпиков
