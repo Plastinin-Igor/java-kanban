@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-public abstract class TaskItem  implements Comparable<TaskItem> {
+public abstract class TaskItem implements Comparable<TaskItem> {
     private int taskId; // Уникальный идентификационный номер задачи
     private String taskName; // Название, кратко описывающее суть задачи
     private String taskDescription; // Описание, в котором раскрываются детали
@@ -108,7 +108,11 @@ public abstract class TaskItem  implements Comparable<TaskItem> {
     }
 
     public LocalDateTime getEndTime() {
-        return startTime.plusMinutes(duration.toMinutes());
+        if (startTime != null) {
+            return startTime.plusMinutes(duration.toMinutes());
+        } else {
+            return null;
+        }
     }
 
     @Override

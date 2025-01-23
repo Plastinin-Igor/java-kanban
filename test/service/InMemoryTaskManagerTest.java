@@ -15,12 +15,13 @@ class InMemoryTaskManagerTest {
     InMemoryTaskManager taskManager = new InMemoryTaskManager();
 
 
-    Task taskObj = new Task("Задача № 1", "Описание задачи №1", Status.NEW);
+    Task taskObj = new Task("Задача № 1", "Описание задачи №1", Status.NEW,
+            Duration.ofMinutes(1), LocalDateTime.of(2025, 1, 1, 10, 0));
     Epic epicObj = new Epic("Эпик-задача № 1", "Описание эпик-задачи №1");
     Epic epic1 = taskManager.addNewEpic(epicObj);
     Subtask subtaskObj = new Subtask("Первая подзадача в эпике № 1", "Первая подзадача в эпике № 1",
             Status.NEW, epic1.getTaskId(), Duration.ofMinutes(10),
-            LocalDateTime.of(2025, 1, 1, 10, 0));
+            LocalDateTime.of(2025, 1, 1, 10, 30));
 
     @Test
     void getListTask() {
@@ -131,7 +132,8 @@ class InMemoryTaskManagerTest {
     void updateTask() {
         Task task = taskManager.addNewTask(taskObj);
         int taskId = task.getTaskId();
-        Task taskUpdate = new Task(taskId, "Задача № 1", "Описание задачи №1", Status.IN_PROGRESS);
+        Task taskUpdate = new Task(taskId, "Задача № 1", "Описание задачи №1", Status.IN_PROGRESS,
+                Duration.ofMinutes(1), LocalDateTime.of(2025, 1, 1, 10, 0));
         taskManager.updateTask(taskUpdate);
         Task taskAfterUpdate = taskManager.getTaskById(taskId);
 
