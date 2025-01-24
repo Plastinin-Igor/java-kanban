@@ -5,6 +5,8 @@ import model.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 
 /**
@@ -105,7 +107,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private void save() {
         try (FileWriter fileWriter = new FileWriter(path, StandardCharsets.UTF_8)) {
             //Запись в файл заголовка
-            fileWriter.write("id,type,name,status,description,epic\n");
+            fileWriter.write("id,type,name,status,description,duration,startTime,epic\n");
             //Запись данных
             for (Task task : super.getListTask()) {
                 fileWriter.write(task.toStringForFileCSV());
@@ -166,6 +168,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name;
         String description;
         Status status;
+        Duration duration;
+        LocalDateTime startTime;
         int epicId;
 
         switch (line[1]) {
@@ -174,22 +178,28 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 name = line[2];
                 status = Status.valueOf(line[3]);
                 description = line[4];
-                return new Task(id, name, description, status);
+                duration = Duration.ofMinutes(Long.parseLong(line[5]));
+                startTime = LocalDateTime.parse(line[6], TaskItem.DATE_TIME_FORMAT);
+                return new Task(id, name, description, status, duration, startTime);
             }
             case "EPIC" -> {
                 id = Integer.parseInt(line[0]);
                 name = line[2];
                 status = Status.valueOf(line[3]);
                 description = line[4];
-                return new Epic(id, name, description, status);
+                duration = Duration.ofMinutes(Long.parseLong(line[5]));
+                startTime = LocalDateTime.parse(line[6], TaskItem.DATE_TIME_FORMAT);
+                return new Epic(id, name, description, status, duration, startTime);
             }
             case "SUBTASK" -> {
                 id = Integer.parseInt(line[0]);
                 name = line[2];
                 status = Status.valueOf(line[3]);
                 description = line[4];
-                epicId = Integer.parseInt(line[5]);
-                return new Subtask(id, name, description, status, epicId);
+                duration = Duration.ofMinutes(Long.parseLong(line[5]));
+                startTime = LocalDateTime.parse(line[6], TaskItem.DATE_TIME_FORMAT);
+                epicId = Integer.parseInt(line[7]);
+                return new Subtask(id, name, description, status, epicId, duration, startTime);
             }
             default -> throw new ManagerSaveException("Ошибка при восстановлении данных из файла " + path
                     + ". Не определен тип задачи " + line[1] + ".");

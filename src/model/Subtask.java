@@ -1,5 +1,8 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Subtask extends TaskItem {
     private final int epicId;
 
@@ -8,10 +11,23 @@ public class Subtask extends TaskItem {
         this.epicId = epicId;
     }
 
+    public Subtask(int taskId, String taskName, String taskDescription, Status taskStatus, int epicId,
+                   Duration duration, LocalDateTime startTime) {
+        super(taskId, taskName, taskDescription, taskStatus, duration, startTime);
+        this.epicId = epicId;
+    }
+
     public Subtask(String taskName, String taskDescription, Status taskStatus, int epicId) {
         super(taskName, taskDescription, taskStatus);
         this.epicId = epicId;
     }
+
+    public Subtask(String taskName, String taskDescription, Status taskStatus, int epicId,
+                   Duration duration, LocalDateTime startTime) {
+        super(taskName, taskDescription, taskStatus, duration, startTime);
+        this.epicId = epicId;
+    }
+
 
     public int getEpicId() {
         return epicId;
@@ -25,6 +41,9 @@ public class Subtask extends TaskItem {
                 ", Наименование='" + super.getTaskName() + '\'' +
                 ", Описание='" + super.getTaskDescription() + '\'' +
                 ", Статус='" + super.getTaskStatus() + '\'' +
+                ", Продолжительность='" + super.getDuration().toMinutes() + '\'' +
+                ", Дата и веремя начала задачи='" + super.getStartTime() + '\'' +
+                ", Дата и время завершения задачи='" + super.getEndTime() + '\'' +
                 '}';
     }
 
@@ -34,8 +53,9 @@ public class Subtask extends TaskItem {
      * @return String
      */
     public String toStringForFileCSV() {
-        return String.format("%s,%s,%s,%s,%s,%s\n", super.getTaskId(), TypesOfTasks.SUBTASK, super.getTaskName(),
-                super.getTaskStatus(), super.getTaskDescription(), getEpicId());
+        return String.format("%s,%s,%s,%s,%s,%s,%s,%s\n", super.getTaskId(), TypesOfTasks.SUBTASK, super.getTaskName(),
+                super.getTaskStatus(), super.getTaskDescription(), super.getDuration().toMinutes(),
+                super.getStartTime().format(DATE_TIME_FORMAT), getEpicId());
     }
 
 }
