@@ -95,8 +95,14 @@ public class Epic extends TaskItem {
         if (super.getStartTime() != null) {
             stringStartTime = super.getStartTime().format(DATE_TIME_FORMAT);
         }
+        Duration duration;
+        if (super.getDuration() != null) {
+            duration = getDuration();
+        } else {
+            duration = Duration.ofMinutes(0);
+        }
         return String.format("%s,%s,%s,%s,%s,%s,%s\n", super.getTaskId(), TypesOfTasks.EPIC, super.getTaskName(),
-                super.getTaskStatus(), super.getTaskDescription(), super.getDuration().toMinutes(),
+                super.getTaskStatus(), super.getTaskDescription(), duration.toMinutes(),
                 stringStartTime);
     }
 }

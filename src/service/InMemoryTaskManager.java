@@ -93,23 +93,27 @@ public class InMemoryTaskManager implements TaskManager {
         // Проверяем, есть ли подзадачи у эпика
         if (!epic.getSubtaskListId().isEmpty()) {
             for (Integer epicsSub : epic.getSubtaskListId()) {
-                duration = duration.plus(subtaskMap.get(epicsSub).getDuration());
-                listSubtask.add(subtaskMap.get(epicsSub));
+                if (subtaskMap.get(epicsSub).getDuration() != null) {
+                    duration = duration.plus(subtaskMap.get(epicsSub).getDuration());
+                    listSubtask.add(subtaskMap.get(epicsSub));
+                }
             }
-            epic.setDuration(duration);
             // Если список подзадач не пустой, определяем время начала и окончания
             if (!listSubtask.isEmpty()) {
+                epic.setDuration(duration);
                 listSubtask.sort(Comparator.comparing(TaskItem::getStartTime));
                 epic.setStartTime(listSubtask.getFirst().getStartTime());
                 epic.setEndTime(listSubtask.getLast().getEndTime());
             } else {
                 epic.setStartTime(null);
                 epic.setEndTime(null);
+                epic.setDuration(null);
             }
         } else {
             // Если у эпика нет подзадач, устанавливаем null для времени начала и окончания
             epic.setStartTime(null);
             epic.setEndTime(null);
+            epic.setDuration(null);
         }
     }
 
@@ -359,10 +363,9 @@ public class InMemoryTaskManager implements TaskManager {
                     .filter(taskExisting -> taskExisting.getTaskId() != task.getTaskId())
                     .anyMatch(taskExisting -> isIntersect(task, taskExisting));
             if (!isIntersect) {
+                prioritizedTasksTree.remove(taskMap.get(task.getTaskId())); // удаляем из отсортированного списка
                 taskMap.put(task.getTaskId(), task);
-                // Обновим задачу в отсортированном списке
-                prioritizedTasksTree.remove(taskMap.get(task.getTaskId()));
-                prioritizedTasksTree.add(task);
+                prioritizedTasksTree.add(task); // добавляем в отсортированный списк
                 return task;
             } else {
                 return null;
@@ -408,12 +411,11 @@ public class InMemoryTaskManager implements TaskManager {
                         .filter(subtaskExisting -> subtaskExisting.getTaskId() != subtask.getTaskId())
                         .anyMatch(subtaskExisting -> isIntersect(subtask, subtaskExisting));
                 if (!isIntersect) {
+                    prioritizedTasksTree.remove(subtaskMap.get(subtask.getTaskId())); // удаляем задачу в отсортированном списке
                     subtaskMap.put(subtask.getTaskId(), subtask);
                     updateEpicStatus(epicMap.get(subtask.getEpicId())); // обновление статуса в эпик-задаче
                     calculateTimeForEpic(epicMap.get(subtask.getEpicId())); // обновляем расчет времени в эпике
-                    // Обновляем задачу в отсортированном списке
-                    prioritizedTasksTree.remove(subtaskMap.get(subtask.getTaskId()));
-                    prioritizedTasksTree.add(subtask);
+                    prioritizedTasksTree.add(subtask); // Обновляем задачу в отсортированном списке
                     return subtask;
                 } else {
                     return null;
@@ -450,9 +452,9 @@ public class InMemoryTaskManager implements TaskManager {
             // Удаление, связанных с эпиком подзадач
             epicMap.get(taskId).getSubtaskListId().stream()
                     .peek(subtask -> {
-                        subtaskMap.remove(subtask);
-                        historyManager.remove(subtask);
                         prioritizedTasksTree.remove(subtaskMap.get(subtask));
+                        historyManager.remove(subtask);
+                        subtaskMap.remove(subtask);
                     });
             //Удаляем эпик
             epicMap.remove(taskId);
