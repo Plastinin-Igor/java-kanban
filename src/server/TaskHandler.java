@@ -5,10 +5,12 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import model.Endpoint;
+import model.Task;
 import model.TaskManager;
 import util.LocalDataTimeTypeAdapter;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -41,7 +43,8 @@ public class TaskHandler implements HttpHandler {
                 break;
             }
             case POST_TASKS: {
-                writeResponse(exchange, "Это POST_TASKS", 200);
+                //writeResponse(exchange, "Это POST_TASKS", 200);
+                handlePostTasks(exchange);
             }
             case DELETE_TASKS: {
                 writeResponse(exchange, "Это DELETE_TASKS", 200);
@@ -85,6 +88,25 @@ public class TaskHandler implements HttpHandler {
         }
     }
 
+    /**
+     * Добавление задачи
+     *
+     * @param exchange HttpExchange
+     * @throws IOException
+     */
+    private void handlePostTasks(HttpExchange exchange) throws IOException {
+        InputStream inputStream = exchange.getRequestBody();
+        String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        Task task;
+        try {
+            task = getGson().fromJson(body, Task.class);
+            taskManager.addNewTask(task);
+            writeResponse(exchange, "Задача с id=" + task.getTaskId() + " успешно добавлена", 201);
+        } catch (Exception e) {
+            writeResponse(exchange, "Errors..: " + e.getMessage(), 400);
+        }
+
+    }
 
     /**
      * Определяет endpoint по URL и HTTP-методу
