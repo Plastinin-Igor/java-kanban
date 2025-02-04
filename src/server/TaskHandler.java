@@ -4,109 +4,424 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import model.Endpoint;
-import model.Task;
-import model.TaskManager;
+import exceptions.IntersectException;
+import model.*;
+import util.DurationAdapter;
 import util.LocalDataTimeTypeAdapter;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaskHandler implements HttpHandler {
-    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
-    private TaskManager taskManager;
-
+    private final TaskManager taskManager;
+    private final BaseHttpHandler baseHttpHandler = new BaseHttpHandler();
 
     public TaskHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
     }
 
+    private final Gson gson = getGson();
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-
-        //TODO убрать System.out.println !
-        System.out.println("Путь: " + exchange.getRequestURI().getPath() + " Метод: " + exchange.getRequestMethod());
-
         Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestMethod());
+        String path = exchange.getRequestURI().getPath();
 
-        switch (endpoint) {
-            case GET_TASKS: {
-                writeResponse(exchange, "Это GET_TASKS", 200);
-                break;
+        try {
+            switch (endpoint) {
+                case GET_TASKS: {
+                    handleGetTask(exchange); // Запрос GET: /tasks
+                    break;
+                }
+                case GET_TASKS_ID: {
+                    handleGetTaskId(exchange, path); // Запрос GET: /tasks/{id}
+                    break;
+                }
+                case POST_TASKS: {
+                    handlePostTasks(exchange, path); // Запрос POST: /tasks/{id} и /tasks
+                    break;
+                }
+                case DELETE_TASKS: {
+                    handleDeleteTask(exchange, path); // Запрос DELETE /tasks/{id}
+                    break;
+                }
+                case GET_SUBTASKS: {
+                    handleGetSubtasks(exchange); // Запрос GET: /subtasks
+                    break;
+                }
+                case GET_SUBTASKS_ID: {
+                    handleGetSubtaskId(exchange, path); // Запрос GET: /subtasks/{id}
+                    break;
+                }
+                case POST_SUBTASKS: {
+                    handlePostSubtasks(exchange, path); // Запрос POST: /subtasks/{id} и /subtasks
+                }
+                case DELETE_SUBTASKS: {
+                    handleDeleteSubtask(exchange, path); // Запрос DELETE /subtasks/{id}
+                }
+                case GET_EPICS: {
+                    handleGetEpics(exchange); // Запрос GET: /epics
+                }
+                case GET_EPICS_SUBTASKS: {
+                    handleGetEpicSubtask(exchange, path); // Запрос GET: epics/{id}/subtask
+                }
+                case POST_EPICS: {
+                    handlePostEpics(exchange); // Запрос POST: /epic
+                }
+                case GET_EPICS_ID: {
+                    handleGetEpicId(exchange, path); // Запрос GET: /epics/{id}
+                }
+                case DELETE_EPICS: {
+                    handleDeleteEpic(exchange, path); // Запрос DELETE: /epics/{id}
+                }
+                case GET_HISTORY: {
+                    handleGetHistory(exchange); // Запрос GET: /history
+                }
+                case GET_PRIORITIZED: {
+                    handleGetPrioritised(exchange); // Запрос GET: /prioritised
+                }
+                default: {
+                    baseHttpHandler.sendError(exchange, "Неизвестный эндпоинт: "
+                            + " Метод: " + exchange.getRequestMethod() + " url: "
+                            + exchange.getRequestURI().getPath(), 400);
+                }
             }
-            case GET_TASKS_ID: {
-                writeResponse(exchange, "Это GET_TASKS_ID", 200);
-                break;
-            }
-            case POST_TASKS: {
-                //writeResponse(exchange, "Это POST_TASKS", 200);
-                handlePostTasks(exchange);
-            }
-            case DELETE_TASKS: {
-                writeResponse(exchange, "Это DELETE_TASKS", 200);
-            }
-            case GET_SUBTASKS: {
-                writeResponse(exchange, "Это GET_SUBTASKS", 200);
-            }
-            case GET_SUBTASKS_ID: {
-                writeResponse(exchange, "Это GET_SUBTASKS_ID", 200);
-            }
-            case POST_SUBTASKS: {
-                writeResponse(exchange, "Это POST_SUBTASKS", 200);
-            }
-            case DELETE_SUBTASKS: {
-                writeResponse(exchange, "Это DELETE_SUBTASKS", 200);
-            }
-            case GET_EPICS: {
-                writeResponse(exchange, "Это GET_EPICS", 200);
-            }
-            case GET_EPICS_SUBTASKS: {
-                writeResponse(exchange, "Это GET_EPICS_SUBTASKS", 200);
-            }
-            case POST_EPICS: {
-                writeResponse(exchange, "Это POST_EPICS", 200);
-            }
-            case GET_EPICS_ID: {
-                writeResponse(exchange, "Это GET_EPICS_ID", 200);
-            }
-            case DELETE_EPICS: {
-                writeResponse(exchange, "Это DELETE_EPICS", 200);
-            }
-            case GET_HISTORY: {
-                writeResponse(exchange, "Это GET_HISTORY", 200);
-            }
-            case GET_PRIORITIZED: {
-                writeResponse(exchange, "Это GET_PRIORITIZED", 200);
-            }
-            default: {
-                writeResponse(exchange, "Неизвестный ендпоинт", 400);
-            }
+        } catch (Exception e) {
+            baseHttpHandler.sendError(exchange, e.getMessage(), 500);
+        } finally {
+            exchange.close();
         }
     }
 
     /**
-     * Добавление задачи
+     * Обработчик запроса GET: /tasks
      *
      * @param exchange HttpExchange
-     * @throws IOException
      */
-    private void handlePostTasks(HttpExchange exchange) throws IOException {
-        InputStream inputStream = exchange.getRequestBody();
-        String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        Task task;
-        try {
-            task = getGson().fromJson(body, Task.class);
-            taskManager.addNewTask(task);
-            writeResponse(exchange, "Задача с id=" + task.getTaskId() + " успешно добавлена", 201);
-        } catch (Exception e) {
-            writeResponse(exchange, "Errors..: " + e.getMessage(), 400);
+    private void handleGetTask(HttpExchange exchange) throws IOException {
+        List<Task> taskList = new ArrayList<>(taskManager.getListTask());
+        if (!taskList.isEmpty()) {
+            String taskListJson = gson.toJson(taskList);
+            baseHttpHandler.sendText(exchange, taskListJson);
+        } else {
+            baseHttpHandler.sendNotFound(exchange, "Данные не найдены");
         }
-
     }
+
+    /**
+     * Обработчик запроса GET: /tasks{id}
+     *
+     * @param exchange HttpExchange
+     */
+    private void handleGetTaskId(HttpExchange exchange, String path) throws IOException {
+        String[] pathPart = path.split("/");
+        int id = parsePathId(pathPart[2]);
+
+        if (id != -1) {
+            Task task = taskManager.getTaskById(id);
+            if (task != null) {
+                String taskJson = gson.toJson(task);
+                baseHttpHandler.sendText(exchange, taskJson);
+            } else {
+                baseHttpHandler.sendNotFound(exchange, "Задача с id: " + id + " не найдена.");
+            }
+        } else {
+            baseHttpHandler.sendError(exchange, "Получен некорректный id: " + pathPart[2], 405);
+        }
+    }
+
+    /**
+     * Обработчик запроса POST: /tasks{id} и /tasks
+     * Создаем задачу, если id не указан.
+     * Если id указан, то обновляем
+     *
+     * @param exchange HttpExchange
+     */
+    private void handlePostTasks(HttpExchange exchange, String path) throws IOException {
+        String[] pathPart = path.split("/");
+        try {
+            // Добавление задачи
+            if (pathPart.length == 2) {
+                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                Task task = gson.fromJson(body, Task.class);
+                taskManager.addNewTask(task);
+                baseHttpHandler.sendText(exchange, "Задача id: " + task.getTaskId() + " успешно добавлена.");
+            } else {
+                // Исправление задачи
+                int id = parsePathId(pathPart[2]);
+                if (id != -1) {
+                    String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                    Task task = gson.fromJson(body, Task.class);
+                    if (taskManager.getTaskById(task.getTaskId()) != null) {
+                        taskManager.updateTask(task);
+                        baseHttpHandler.sendText(exchange, "Задача id: " + task.getTaskId() + " успешно обновлена.");
+                    } else {
+                        baseHttpHandler.sendNotFound(exchange, "Задача с id: " + id + " не найдена.");
+                    }
+                } else {
+                    baseHttpHandler.sendError(exchange, "Получен некорректный id: " + pathPart[2], 405);
+                }
+            }
+        } catch (IntersectException e) {
+            baseHttpHandler.sendHasInteractions(exchange, "Задача пересекается с существующими. " +
+                    "Добавление/исправление недопустимо");
+        }
+    }
+
+    /**
+     * Обработчик запроса DELETE /tasks/{id}
+     *
+     * @param exchange HttpExchange
+     * @param path     String
+     */
+    private void handleDeleteTask(HttpExchange exchange, String path) throws IOException {
+        String[] pathPart = path.split("/");
+        int id = parsePathId(pathPart[2]);
+
+        if (id != -1) {
+            Task task = taskManager.getTaskById(id);
+            if (task != null) {
+                taskManager.deleteTaskById(id);
+                baseHttpHandler.sendText(exchange, "Задача с id: " + id + " успешно удалена.");
+            } else {
+                baseHttpHandler.sendNotFound(exchange, "Задача с id: " + id + " не найдена.");
+            }
+        } else {
+            baseHttpHandler.sendError(exchange, "Получен некорректный id: " + pathPart[2], 405);
+        }
+    }
+
+    /**
+     * Обработчик запроса GET: /subtasks
+     *
+     * @param exchange HttpExchange
+     */
+    private void handleGetSubtasks(HttpExchange exchange) throws IOException {
+        List<Subtask> subtaskList = new ArrayList<>(taskManager.getListSubtask());
+        if (!subtaskList.isEmpty()) {
+            String taskListJson = gson.toJson(subtaskList);
+            baseHttpHandler.sendText(exchange, taskListJson);
+        } else {
+            baseHttpHandler.sendNotFound(exchange, "Данные не найдены");
+        }
+    }
+
+    /**
+     * Обработчик запроса GET: /subtasks{id}
+     *
+     * @param exchange HttpExchange
+     */
+    private void handleGetSubtaskId(HttpExchange exchange, String path) throws IOException {
+        String[] pathPart = path.split("/");
+        int id = parsePathId(pathPart[2]);
+
+        if (id != -1) {
+            Subtask subtask = taskManager.getSubtaskById(id);
+            if (subtask != null) {
+                String subtaskJson = gson.toJson(subtask);
+                baseHttpHandler.sendText(exchange, subtaskJson);
+            } else {
+                baseHttpHandler.sendNotFound(exchange, "Задача с id: " + id + " не найдена.");
+            }
+        } else {
+            baseHttpHandler.sendError(exchange, "Получен некорректный id: " + pathPart[2], 405);
+        }
+    }
+
+    /**
+     * Обработчик запроса POST: /subtasks{id} и /subtasks
+     * Создаем задачу, если id не указан.
+     * Если id указан, то обновляем
+     *
+     * @param exchange HttpExchange
+     */
+    private void handlePostSubtasks(HttpExchange exchange, String path) throws IOException {
+        String[] pathPart = path.split("/");
+        try {
+            // Добавление задачи
+            if (pathPart.length == 2) {
+                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                Subtask subtask = gson.fromJson(body, Subtask.class);
+                taskManager.addNewSubtask(subtask);
+                baseHttpHandler.sendText(exchange, "Задача id: " + subtask.getTaskId() + " успешно добавлена.");
+            } else {
+                // Исправление задачи
+                int id = parsePathId(pathPart[2]);
+                if (id != -1) {
+                    String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                    Subtask subtask = gson.fromJson(body, Subtask.class);
+                    if (taskManager.getSubtaskById(subtask.getTaskId()) != null) {
+                        taskManager.updateSubtask(subtask);
+                        baseHttpHandler.sendText(exchange, "Задача id: " + subtask.getTaskId() + " успешно обновлена.");
+                    } else {
+                        baseHttpHandler.sendNotFound(exchange, "Задача с id: " + id + " не найдена.");
+                    }
+                } else {
+                    baseHttpHandler.sendError(exchange, "Получен некорректный id: " + pathPart[2], 405);
+                }
+            }
+        } catch (IntersectException e) {
+            baseHttpHandler.sendHasInteractions(exchange, "Задача пересекается с существующими. " +
+                    "Добавление/исправление недопустимо");
+        }
+    }
+
+    /**
+     * Обработчик запроса DELETE /subtasks/{id}
+     *
+     * @param exchange HttpExchange
+     * @param path     String
+     */
+    private void handleDeleteSubtask(HttpExchange exchange, String path) throws IOException {
+        String[] pathPart = path.split("/");
+        int id = parsePathId(pathPart[2]);
+
+        if (id != -1) {
+            Subtask subtask = taskManager.getSubtaskById(id);
+            if (subtask != null) {
+                taskManager.deleteSubtaskById(id);
+                baseHttpHandler.sendText(exchange, "Задача с id: " + id + " успешно удалена.");
+            } else {
+                baseHttpHandler.sendNotFound(exchange, "Задача с id: " + id + " не найдена.");
+            }
+        } else {
+            baseHttpHandler.sendError(exchange, "Получен некорректный id: " + pathPart[2], 405);
+        }
+    }
+
+    /**
+     * Обработчик запроса GET: /epics
+     *
+     * @param exchange HttpExchange
+     */
+    private void handleGetEpics(HttpExchange exchange) throws IOException {
+        List<Epic> epicList = new ArrayList<>(taskManager.getListEpic());
+        if (!epicList.isEmpty()) {
+            String epicListJson = gson.toJson(epicList);
+            baseHttpHandler.sendText(exchange, epicListJson);
+        } else {
+            baseHttpHandler.sendNotFound(exchange, "Данные не найдены");
+        }
+    }
+
+
+    /**
+     * Обработчик запроса GET: /epics{id}
+     *
+     * @param exchange HttpExchange
+     */
+    private void handleGetEpicId(HttpExchange exchange, String path) throws IOException {
+        String[] pathPart = path.split("/");
+        int id = parsePathId(pathPart[2]);
+
+        if (id != -1) {
+            Epic epic = taskManager.getEpicById(id);
+            if (epic != null) {
+                String epicJson = gson.toJson(epic);
+                baseHttpHandler.sendText(exchange, epicJson);
+            } else {
+                baseHttpHandler.sendNotFound(exchange, "Задача с id: " + id + " не найдена.");
+            }
+        } else {
+            baseHttpHandler.sendError(exchange, "Получен некорректный id: " + pathPart[2], 405);
+        }
+    }
+
+    /**
+     * Обработчик запроса GET: epics/{id}/subtask
+     *
+     * @param exchange HttpExchange
+     */
+    private void handleGetEpicSubtask(HttpExchange exchange, String path) throws IOException {
+        String[] pathPart = path.split("/");
+        int id = parsePathId(pathPart[2]);
+        if (id != -1) {
+            Epic epic = taskManager.getEpicById(id);
+            if (epic != null) {
+                List<Subtask> subtaskList = new ArrayList<>(taskManager.getSubtaskByEpicId(epic.getTaskId()));
+                if (!subtaskList.isEmpty()) {
+                    String subtaskListJson = gson.toJson(subtaskList);
+                    baseHttpHandler.sendText(exchange, subtaskListJson);
+                } else {
+                    baseHttpHandler.sendNotFound(exchange, "Данные не найдены");
+                }
+            } else {
+                baseHttpHandler.sendNotFound(exchange, "Задача с id: " + id + " не найдена.");
+            }
+        } else {
+            baseHttpHandler.sendError(exchange, "Получен некорректный id: " + pathPart[2], 405);
+        }
+    }
+
+    /**
+     * Обработчик запроса POST: /epics
+     *
+     * @param exchange HttpExchange
+     */
+    private void handlePostEpics(HttpExchange exchange) throws IOException {
+        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        Epic epic = gson.fromJson(body, Epic.class);
+        taskManager.addNewEpic(epic);
+        baseHttpHandler.sendText(exchange, "Задача id: " + epic.getTaskId() + " успешно добавлена.");
+    }
+
+    /**
+     * Обработчик запроса DELETE /epics/{id}
+     *
+     * @param exchange HttpExchange
+     * @param path     String
+     */
+    private void handleDeleteEpic(HttpExchange exchange, String path) throws IOException {
+        String[] pathPart = path.split("/");
+        int id = parsePathId(pathPart[2]);
+
+        if (id != -1) {
+            Epic epic = taskManager.getEpicById(id);
+            if (epic != null) {
+                taskManager.deleteEpicById(id);
+                baseHttpHandler.sendText(exchange, "Задача с id: " + id + " успешно удалена.");
+            } else {
+                baseHttpHandler.sendNotFound(exchange, "Задача с id: " + id + " не найдена.");
+            }
+        } else {
+            baseHttpHandler.sendError(exchange, "Получен некорректный id: " + pathPart[2], 405);
+        }
+    }
+
+    /**
+     * Обработчик запроса GET: /history
+     *
+     * @param exchange HttpExchange
+     */
+    private void handleGetHistory(HttpExchange exchange) throws IOException {
+        List<TaskItem> taskItemList = new ArrayList<>(taskManager.getHistory());
+        if (!taskItemList.isEmpty()) {
+            String taskItemJson = gson.toJson(taskItemList);
+            baseHttpHandler.sendText(exchange, taskItemJson);
+        } else {
+            baseHttpHandler.sendNotFound(exchange, "Данные не найдены");
+        }
+    }
+
+    /**
+     * Обработчик запроса GET: /prioritised
+     *
+     * @param exchange HttpExchange
+     */
+    private void handleGetPrioritised(HttpExchange exchange) throws IOException {
+        List<TaskItem> taskItemList = new ArrayList<>(taskManager.getPrioritizedTasks());
+        if (!taskItemList.isEmpty()) {
+            String taskItemJson = gson.toJson(taskItemList);
+            baseHttpHandler.sendText(exchange, taskItemJson);
+        } else {
+            baseHttpHandler.sendNotFound(exchange, "Данные не найдены");
+        }
+    }
+
 
     /**
      * Определяет endpoint по URL и HTTP-методу
@@ -138,7 +453,7 @@ public class TaskHandler implements HttpHandler {
         }
 
         // Метод POST
-        if (requestMethod.equals("POST") && pathParts.length == 2) {
+        if (requestMethod.equals("POST") && (pathParts.length == 2 || pathParts.length == 3)) {
             switch (pathParts[1]) {
                 case "tasks" -> {
                     return Endpoint.POST_TASKS;
@@ -196,22 +511,31 @@ public class TaskHandler implements HttpHandler {
         return Endpoint.UNKNOWN;
     }
 
-    private void writeResponse(HttpExchange exchange,
-                               String responseString,
-                               int responseCode) throws IOException {
-        try (OutputStream os = exchange.getResponseBody()) {
-            exchange.sendResponseHeaders(responseCode, 0);
-            os.write(responseString.getBytes(DEFAULT_CHARSET));
-        }
-        exchange.close();
-    }
-
-
+    /**
+     * GsonBuilder
+     *
+     * @return Gson
+     */
     private Gson getGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDataTimeTypeAdapter());
+        gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
         gsonBuilder.setPrettyPrinting();
         return gsonBuilder.create();
+    }
+
+    /**
+     * Возвращает id задачаи из строки
+     *
+     * @param path String
+     * @return int
+     */
+    private int parsePathId(String path) {
+        try {
+            return Integer.parseInt(path);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
 }

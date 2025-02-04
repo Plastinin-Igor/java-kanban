@@ -1,5 +1,6 @@
 package service;
 
+import exceptions.IntersectException;
 import model.*;
 import util.*;
 
@@ -300,7 +301,8 @@ public class InMemoryTaskManager implements TaskManager {
             }
             return task;
         } else {
-            return null;
+            throw new IntersectException("Задача пересекается с существующими. " +
+                    "Добавление/Исправление недопустимо.");
         }
     }
 
@@ -341,7 +343,8 @@ public class InMemoryTaskManager implements TaskManager {
                 }
                 return subtask;
             } else {
-                return null;
+                throw new IntersectException("Задача пересекается с существующими. " +
+                        "Добавление/Исправление недопустимо.");
             }
         } else {
             System.out.println("Не найден эпик с ID " + subtask.getEpicId());
@@ -368,7 +371,8 @@ public class InMemoryTaskManager implements TaskManager {
                 prioritizedTasksTree.add(task); // добавляем в отсортированный списк
                 return task;
             } else {
-                return null;
+                throw new IntersectException("Задача пересекается с существующими. " +
+                        "Добавление/Исправление недопустимо.");
             }
         } else {
             return null;
@@ -418,7 +422,8 @@ public class InMemoryTaskManager implements TaskManager {
                     prioritizedTasksTree.add(subtask); // Обновляем задачу в отсортированном списке
                     return subtask;
                 } else {
-                    return null;
+                    throw new IntersectException("Задача пересекается с существующими. " +
+                            "Добавление/Исправление недопустимо.");
                 }
             } else {
                 System.out.println("Подзадачи не переходят между Эпиками");
