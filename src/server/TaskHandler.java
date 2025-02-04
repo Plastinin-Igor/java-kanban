@@ -1,18 +1,14 @@
 package server;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import exceptions.IntersectException;
 import model.*;
-import util.DurationAdapter;
-import util.LocalDataTimeTypeAdapter;
+import util.Managers;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +20,7 @@ public class TaskHandler implements HttpHandler {
         this.taskManager = taskManager;
     }
 
-    private final Gson gson = getGson();
+    private final Gson gson = Managers.getGson();
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -509,19 +505,6 @@ public class TaskHandler implements HttpHandler {
             }
         }
         return Endpoint.UNKNOWN;
-    }
-
-    /**
-     * GsonBuilder
-     *
-     * @return Gson
-     */
-    private Gson getGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDataTimeTypeAdapter());
-        gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
-        gsonBuilder.setPrettyPrinting();
-        return gsonBuilder.create();
     }
 
     /**
