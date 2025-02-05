@@ -13,49 +13,52 @@ import java.time.LocalDateTime;
 
 public class HttpTaskServer {
     public static final int PORT = 8080;
-    private static TaskManager taskManager;
-    private static final HttpServer httpServer;
+    private final HttpServer httpServer;
+    private final TaskManager taskManager;
 
-    static {
-        try {
-            httpServer = HttpServer.create();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+    public HttpTaskServer(TaskManager taskManager) throws IOException {
+        this.taskManager = taskManager;
+        httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
+        httpServer.createContext("/", new TaskHandler(taskManager));
     }
 
     public HttpTaskServer() throws IOException {
-        taskManager = Managers.getDefault();
+        this.taskManager = Managers.getDefault();
+        httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
+        httpServer.createContext("/", new TaskHandler(taskManager));
     }
 
-    public HttpTaskServer(TaskManager taskManager) throws IOException {
-        HttpTaskServer.taskManager = taskManager;
-    }
-
-    public static void start() throws IOException {
-        httpServer.bind(new InetSocketAddress(PORT), 0); // связываем сервер с сетевым портом
-        httpServer.createContext("/", new TaskHandler(taskManager)); // связываем путь и обработчик
-        httpServer.start();
+    public void start() {
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
         System.out.println("http://localhost:" + PORT + "/");
+        httpServer.start();
     }
 
-    public static void stop() {
+    public void stop() {
         httpServer.stop(0);
         System.out.println("HTTP-сервер отстановлен на " + PORT + " порту!");
     }
 
+
     public static void main(String[] args) throws IOException {
-        Task task0 = new Task("Задача 1", "Задача 1", Status.NEW, Duration.ofMinutes(10), LocalDateTime.of(2025, 1, 1, 10, 0));
-        Task task1 = new Task("Задача 2", "Задача 2", Status.NEW, Duration.ofMinutes(10), LocalDateTime.of(2025, 1, 1, 10, 20));
-        Task task2 = new Task("Задача 3", "Задача 3", Status.NEW, Duration.ofMinutes(10), LocalDateTime.of(2025, 1, 1, 10, 30));
+        HttpTaskServer httpTaskServer = new HttpTaskServer();
 
-        taskManager = Managers.getDefault();
-        taskManager.addNewTask(task0);
-        taskManager.addNewTask(task1);
-        taskManager.addNewTask(task2);
+        //Инициализируем тестовыми данными:
+        Task task0 = new Task("Задача 1", "Задача 1", Status.NEW, Duration.ofMinutes(10),
+                LocalDateTime.of(2025, 1, 1, 10, 0));
+        Task task1 = new Task("Задача 2", "Задача 2", Status.NEW, Duration.ofMinutes(10),
+                LocalDateTime.of(2025, 1, 1, 10, 20));
+        Task task2 = new Task("Задача 3", "Задача 3", Status.NEW, Duration.ofMinutes(10),
+                LocalDateTime.of(2025, 1, 1, 10, 30));
 
-        start();
+        httpTaskServer.taskManager.addNewTask(task0);
+        httpTaskServer.taskManager.addNewTask(task1);
+        httpTaskServer.taskManager.addNewTask(task2);
+
+        //Запускаем сервер
+        httpTaskServer.start();
     }
+
 
 }

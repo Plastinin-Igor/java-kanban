@@ -145,7 +145,7 @@ public class TaskHandler implements HttpHandler {
                 String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
                 Task task = gson.fromJson(body, Task.class);
                 taskManager.addNewTask(task);
-                baseHttpHandler.sendText(exchange, "Задача id: " + task.getTaskId() + " успешно добавлена.");
+                baseHttpHandler.sendCreated(exchange, "Задача id: " + task.getTaskId() + " успешно добавлена.");
             } else {
                 // Исправление задачи
                 int id = parsePathId(pathPart[2]);
@@ -154,7 +154,7 @@ public class TaskHandler implements HttpHandler {
                     Task task = gson.fromJson(body, Task.class);
                     if (taskManager.getTaskById(task.getTaskId()) != null) {
                         taskManager.updateTask(task);
-                        baseHttpHandler.sendText(exchange, "Задача id: " + task.getTaskId() + " успешно обновлена.");
+                        baseHttpHandler.sendCreated(exchange, "Задача id: " + task.getTaskId() + " успешно обновлена.");
                     } else {
                         baseHttpHandler.sendNotFound(exchange, "Задача с id: " + id + " не найдена.");
                     }
@@ -243,7 +243,7 @@ public class TaskHandler implements HttpHandler {
                 String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
                 Subtask subtask = gson.fromJson(body, Subtask.class);
                 taskManager.addNewSubtask(subtask);
-                baseHttpHandler.sendText(exchange, "Задача id: " + subtask.getTaskId() + " успешно добавлена.");
+                baseHttpHandler.sendCreated(exchange, "Задача id: " + subtask.getTaskId() + " успешно добавлена.");
             } else {
                 // Исправление задачи
                 int id = parsePathId(pathPart[2]);
@@ -252,7 +252,7 @@ public class TaskHandler implements HttpHandler {
                     Subtask subtask = gson.fromJson(body, Subtask.class);
                     if (taskManager.getSubtaskById(subtask.getTaskId()) != null) {
                         taskManager.updateSubtask(subtask);
-                        baseHttpHandler.sendText(exchange, "Задача id: " + subtask.getTaskId() + " успешно обновлена.");
+                        baseHttpHandler.sendCreated(exchange, "Задача id: " + subtask.getTaskId() + " успешно обновлена.");
                     } else {
                         baseHttpHandler.sendNotFound(exchange, "Задача с id: " + id + " не найдена.");
                     }
@@ -362,7 +362,7 @@ public class TaskHandler implements HttpHandler {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         Epic epic = gson.fromJson(body, Epic.class);
         taskManager.addNewEpic(epic);
-        baseHttpHandler.sendText(exchange, "Задача id: " + epic.getTaskId() + " успешно добавлена.");
+        baseHttpHandler.sendCreated(exchange, "Задача id: " + epic.getTaskId() + " успешно добавлена.");
     }
 
     /**
@@ -494,7 +494,7 @@ public class TaskHandler implements HttpHandler {
                     case "history" -> {
                         return Endpoint.GET_HISTORY;
                     }
-                    case "prioritizied" -> {
+                    case "prioritized" -> {
                         return Endpoint.GET_PRIORITIZED;
                     }
                 }
