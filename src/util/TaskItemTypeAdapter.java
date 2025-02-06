@@ -16,7 +16,7 @@ public class TaskItemTypeAdapter implements JsonDeserializer<TaskItem> {
         String taskName = jsonObject.get("taskName").getAsString();
         String taskDescription = jsonObject.get("taskDescription").getAsString();
         Status taskStatus = Status.valueOf(jsonObject.get("taskStatus").getAsString());
-        Duration duration = Duration.parse(jsonObject.get("duration").getAsString());
+        Duration duration = Duration.ofMinutes(Long.parseLong(jsonObject.get("duration").getAsString()));
         LocalDateTime startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString(), TaskItem.DATE_TIME_FORMAT);
 
         if (jsonObject.has("epicId")) { // Если есть поле epicId, то это Subtask

@@ -1,9 +1,7 @@
 package server;
 
 import com.sun.net.httpserver.HttpServer;
-import model.Status;
-import model.Task;
-import model.TaskManager;
+import model.*;
 import util.Managers;
 
 import java.io.IOException;
@@ -37,7 +35,7 @@ public class HttpTaskServer {
 
     public void stop() {
         httpServer.stop(0);
-        System.out.println("HTTP-сервер отстановлен на " + PORT + " порту!");
+        System.out.println("HTTP-сервер остановлен на " + PORT + " порту!");
     }
 
 
@@ -55,6 +53,16 @@ public class HttpTaskServer {
         httpTaskServer.taskManager.addNewTask(task0);
         httpTaskServer.taskManager.addNewTask(task1);
         httpTaskServer.taskManager.addNewTask(task2);
+
+
+        Epic epic = new Epic("Эпик", "Эпик");
+        int epicId = httpTaskServer.taskManager.addNewEpic(epic).getTaskId();
+        Subtask subtask1 = new Subtask("Subtask name", "Subtask name", Status.NEW, epicId,
+                Duration.ofMinutes(10), LocalDateTime.of(2025, 2, 1, 10, 30));
+        Subtask subtask2 = new Subtask("Subtask name", "Subtask name", Status.NEW, epicId,
+                Duration.ofMinutes(10), LocalDateTime.of(2025, 2, 1, 11, 30));
+        httpTaskServer.taskManager.addNewSubtask(subtask1);
+        httpTaskServer.taskManager.addNewSubtask(subtask2);
 
         //Запускаем сервер
         httpTaskServer.start();

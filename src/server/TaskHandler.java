@@ -57,7 +57,7 @@ public class TaskHandler implements HttpHandler {
                     handlePostSubtasks(exchange, path); // Запрос POST: /subtasks/{id} и /subtasks
                 }
                 case DELETE_SUBTASKS: {
-                    handleDeleteSubtask(exchange, path); // Запрос DELETE /subtasks/{id}
+                    handleDeleteSubtask(exchange, path); // Запрос DELETE: /subtasks/{id}
                 }
                 case GET_EPICS: {
                     handleGetEpics(exchange); // Запрос GET: /epics
@@ -78,7 +78,7 @@ public class TaskHandler implements HttpHandler {
                     handleGetHistory(exchange); // Запрос GET: /history
                 }
                 case GET_PRIORITIZED: {
-                    handleGetPrioritised(exchange); // Запрос GET: /prioritised
+                    handleGetPrioritized(exchange); // Запрос GET: /prioritized
                 }
                 default: {
                     baseHttpHandler.sendError(exchange, "Неизвестный эндпоинт: "
@@ -164,7 +164,7 @@ public class TaskHandler implements HttpHandler {
             }
         } catch (IntersectException e) {
             baseHttpHandler.sendHasInteractions(exchange, "Задача пересекается с существующими. " +
-                    "Добавление/исправление недопустимо");
+                    "Добавление/исправление недопустимо.");
         }
     }
 
@@ -408,7 +408,7 @@ public class TaskHandler implements HttpHandler {
      *
      * @param exchange HttpExchange
      */
-    private void handleGetPrioritised(HttpExchange exchange) throws IOException {
+    private void handleGetPrioritized(HttpExchange exchange) throws IOException {
         List<TaskItem> taskItemList = new ArrayList<>(taskManager.getPrioritizedTasks());
         if (!taskItemList.isEmpty()) {
             String taskItemJson = gson.toJson(taskItemList);
