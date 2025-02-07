@@ -106,7 +106,7 @@ class TaskHandlerTest {
 
         //HTTP-клиент и зпрос
         HttpClient clientUpd = HttpClient.newHttpClient();
-        URI urlUpd = URI.create("http://localhost:8080/tasks/1");
+        URI urlUpd = URI.create("http://localhost:8080/tasks");
         HttpRequest requestUpd = HttpRequest.newBuilder()
                 .uri(urlUpd)
                 .POST(HttpRequest.BodyPublishers.ofString(taskJsonUpd))

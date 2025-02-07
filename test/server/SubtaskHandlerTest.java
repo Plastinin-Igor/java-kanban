@@ -113,7 +113,7 @@ public class SubtaskHandlerTest {
 
         //HTTP-клиент и зпрос
         HttpClient clientUpd = HttpClient.newHttpClient();
-        URI urlUpd = URI.create("http://localhost:8080/subtasks/1");
+        URI urlUpd = URI.create("http://localhost:8080/subtasks");
         HttpRequest requestUpd = HttpRequest.newBuilder()
                 .uri(urlUpd)
                 .POST(HttpRequest.BodyPublishers.ofString(taskJsonUpd))
