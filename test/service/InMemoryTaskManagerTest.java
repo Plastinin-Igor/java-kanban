@@ -1,5 +1,6 @@
 package service;
 
+import exceptions.IntersectException;
 import model.*;
 import org.junit.jupiter.api.Assertions;
 
@@ -9,6 +10,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class InMemoryTaskManagerTest {
 
@@ -314,8 +317,16 @@ class InMemoryTaskManagerTest {
     void IntersectionOfIntervalsTask() {
         // 1. Попытаемся добавить 3 задачи с одинаковыми интревалами
         taskManager.addNewTask(taskObj1);
-        taskManager.addNewTask(taskObj2);
-        taskManager.addNewTask(taskObj3);
+
+        // Перехватываем исключение
+        assertThrows(IntersectException.class, () -> {
+            taskManager.addNewTask(taskObj2);
+        }, "Ошибка пересечиния задач");
+
+        assertThrows(IntersectException.class, () -> {
+            taskManager.addNewTask(taskObj3);
+        }, "Ошибка пересечиния задач");
+
 
         //Проверим, что в результате добавлена только одна задача
         Collection<Task> taskList = taskManager.getListTask();
@@ -328,7 +339,12 @@ class InMemoryTaskManagerTest {
         taskObj3.setStartTime(LocalDateTime.of(2025, 1, 1, 10, 18));
         taskObj3.setDuration(Duration.ofMinutes(50)); // меняям продолжительность
         taskManager.addNewTask(taskObj2);
-        taskManager.addNewTask(taskObj3);
+
+        // Перехватываем исключение
+        assertThrows(IntersectException.class, () -> {
+            taskManager.addNewTask(taskObj3);
+        }, "Ошибка пересечиния задач");
+
         taskList = taskManager.getListTask();
 
         //Проверяем, что добавлены только две задачи
