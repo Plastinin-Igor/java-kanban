@@ -234,17 +234,23 @@ public class TaskHandler implements HttpHandler {
         try {
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
             Subtask subtask = gson.fromJson(body, Subtask.class);
-            if (taskManager.getSubtaskById(subtask.getTaskId()) != null) {
-                taskManager.updateSubtask(subtask);
-                baseHttpHandler.sendCreated(exchange, "Задача id: " + subtask.getTaskId() + " успешно обновлена.");
+            if (taskManager.getEpicById(subtask.getEpicId()) != null) {
+                if (taskManager.getSubtaskById(subtask.getTaskId()) != null) {
+                    taskManager.updateSubtask(subtask);
+                    baseHttpHandler.sendCreated(exchange, "Задача id: " + subtask.getTaskId() + " успешно обновлена.");
+                } else {
+                    taskManager.addNewSubtask(subtask);
+                    baseHttpHandler.sendCreated(exchange, "Задача id: " + subtask.getTaskId() + " успешно добавлена.");
+                }
             } else {
-                taskManager.addNewSubtask(subtask);
-                baseHttpHandler.sendCreated(exchange, "Задача id: " + subtask.getTaskId() + " успешно добавлена.");
+                baseHttpHandler.sendNotFound(exchange, "Не найден эпик с id: " + subtask.getEpicId()
+                        + ", в который добавляется подзадача.");
             }
         } catch (IntersectException e) {
             baseHttpHandler.sendHasInteractions(exchange, "Задача пересекается с существующими. " +
                     "Добавление/исправление недопустимо.");
         }
+
     }
 
     /**
@@ -340,10 +346,20 @@ public class TaskHandler implements HttpHandler {
      * @param exchange HttpExchange
      */
     private void handlePostEpics(HttpExchange exchange) throws IOException {
-        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        Epic epic = gson.fromJson(body, Epic.class);
-        taskManager.addNewEpic(epic);
-        baseHttpHandler.sendCreated(exchange, "Задача id: " + epic.getTaskId() + " успешно добавлена.");
+        try {
+            String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            Epic epic = gson.fromJson(body, Epic.class);
+            if (taskManager.getEpicById(epic.getTaskId()) != null) {
+                taskManager.updateEpic(epic);
+                baseHttpHandler.sendCreated(exchange, "Задача id: " + epic.getTaskId() + " успешно обновлена.");
+            } else {
+                taskManager.addNewEpic(epic);
+                baseHttpHandler.sendCreated(exchange, "Задача id: " + epic.getTaskId() + " успешно добавлена.");
+            }
+        } catch (IntersectException e) {
+            baseHttpHandler.sendHasInteractions(exchange, "Задача пересекается с существующими. " +
+                    "Добавление/исправление недопустимо.");
+        }
     }
 
     /**

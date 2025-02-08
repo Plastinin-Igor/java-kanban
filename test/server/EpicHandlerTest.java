@@ -75,6 +75,48 @@ public class EpicHandlerTest {
     }
 
     /**
+     * Изменение эпика POST: /subtasks
+     */
+    @Test
+    void testUpdateSubtask() throws IOException, IntersectException, InterruptedException {
+        System.out.println("Исправление эпика POST: /subtask");
+        // Добавляем эпик и в нем подзадачу
+        Epic epic = new Epic("Epic name", "Epic name");
+        int epicId = taskManager.addNewEpic(epic).getTaskId();
+        String epicJson = gson.toJson(epic);
+
+        //HTTP-клиент и зпрос
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create("http://localhost:8080/epics");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(url)
+                .POST(HttpRequest.BodyPublishers.ofString(epicJson))
+                .build();
+
+        // Вызываем рест
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(201, response.statusCode(), "Код ответа должен быть 201");
+
+        //Вносим изменение в подзадачу (поменяем статс задачи с NEW на DONE)
+        Epic epicUpd = taskManager.getEpicById(1);
+        epicUpd.setTaskName("New epic name");
+        String taskJsonUpd = gson.toJson(epicUpd);
+
+        //HTTP-клиент и зпрос
+        HttpClient clientUpd = HttpClient.newHttpClient();
+        URI urlUpd = URI.create("http://localhost:8080/epics");
+        HttpRequest requestUpd = HttpRequest.newBuilder()
+                .uri(urlUpd)
+                .POST(HttpRequest.BodyPublishers.ofString(taskJsonUpd))
+                .build();
+        // Вызываем рест
+        HttpResponse<String> responseUpd = clientUpd.send(requestUpd, HttpResponse.BodyHandlers.ofString());
+        assertEquals(201, responseUpd.statusCode(), "Код ответа должен быть 200");
+        assertEquals("New epic name", taskManager.getEpicById(1).getTaskName(),
+                "Имя эпика не обновилось");
+    }
+
+    /**
      * Получение эпиков GET: /epics
      */
     @Test
